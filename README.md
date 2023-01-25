@@ -4,4 +4,4 @@ Members:
 Sofia Celestrin - Front-End, 
 Wendell Marshall - Front-End,
 Ryan Campisi - Back-End,
-Jonathan Santiago - Back-End,
+Jonathan Santiago - Back-End
