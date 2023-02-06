@@ -8,7 +8,7 @@ User Stories
     
     4. As a user, I want to be able to directly send people music and receive feedback.
     
-    5. As a system administrator, I want to create a login page so that each user can have their own profile.
+    5. As a musician, I want to be able to see how many people have listened to my posted music.
     
     6. As a musician, I want to be able to advertise my performance ability, so that I can book performances/gigs
     
