@@ -6,6 +6,10 @@ User Stories
 
     3. As a user, I want to be able add friends so that I can easily keep track of them and view their music.
     
+    4. As a user, I want to be able to directly send people music and receive feedback.
+    
+    5. As a system administrator, I want to create a login page so that each user can have their own profile.
+    
 What issues your team planned to address?
 
 Which ones were successfully completed?
