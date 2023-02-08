@@ -20,6 +20,12 @@ User Stories
     
     10. As a musician, I want to be automatically connected with people who share similar musical attributes to me.
     
+    11. As a User, I want to be able to create an account so that I can share my music and get feedback from other people.
+    
+    12. As a System administrator, I want to safely store user data so that it cannot be accessed by unauthorized individuals.
+    
+    13. As a User I want to be able to customize my profile page so that it can match my personality.
+    
     
 What issues your team planned to address?
 
