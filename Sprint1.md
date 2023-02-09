@@ -24,8 +24,14 @@ User Stories
 What issues your team planned to address?
 Front-End: As a team, it has been decided that the front-end would work on creating a sign up and login page. We want users to be able to create an account and then login into it. We also want the user to be able to go to both pages simultaneously. We want to find a way to be able to save the information that they input and put a warning if they typed in something incorrectly. The login page will ask the user for a username and password while the sign up page will ask for an email, username, password, and a confirmation of the password. In the sign up page, if the user puts in a different password in the "confirm password" line then an error should appear. If an invalid email is put then the website should also display an error. 
 
+Back-End: As a team, it has been decided that the back-end would work on a functional api to allow communication between the front and back ends. They will also create a database to store basic user information.
+
 Which ones were successfully completed?
 Front-End: Sofia and Wendell were able to create a login and sign up page. The login page asks the user for a username and password. The sign up page properly displays the email, username, password, and confirm password. 
 
+Back-end: Ryan and Jonathan were able to create the database and api successfully. 
+
 Which ones didn't and why?
 Front-End: We were not able to connect the sign up and login page together. Due to technical issues and getting an understanding for how angular works, we were not able to connect both pages yet, but that is something that we plan to have done by the next sprint. The sign up page does not check for the same passwords or state if the email is correct. We decided that this was not a main priority at the moment and we needed to focus on learning how to use angular and developing the sign up and login page. It took us many tries to successfully create appealing pages and have decided to focus on fixing that issue in the next sprint. 
+
+Back-End: We still haven't fully implemented proper encryption of user data and need to implement user passwors to the database. We also need to connect the back end to the front end. 
