@@ -22,11 +22,14 @@ User Stories
     
     
 What issues your team planned to address?
+
     * Functional Api to allow communication between the front and back ends.
     * Database to store basic user information.
     
 Which ones were successfully completed?
+
     * Database and Api were created sucessuflly.
     
 Which ones didn't and why?
+
     * For the backend we still haven't fully implemented proper encryption of user data and need to implement user passwords to the database.
