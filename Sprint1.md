@@ -52,3 +52,9 @@ We were not able to connect the sign up and login page together. Due to technica
     
     Backend:
         * For the backend we still haven't fully implemented proper encryption of user data and need to implement user passwords to the database.
+        
+ Video Links:
+ 
+Front End: https://youtu.be/qdXiUBXlFzQ
+Back End: https://tinyurl.com/42e4nd9m
+
