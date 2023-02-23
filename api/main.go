@@ -27,6 +27,7 @@ type File struct {
 	Type      string `json:"type" gorm:"not null"`
 	OwnerID   string `json:"owner_id" gorm:"not null"`
 	CreatedAt int64  `json:"created_at" gorm:"not null"`
+	Data      []byte `json:"data" gorm:"not null"`
 }
 
 // Define a global variable for the database connection
@@ -34,24 +35,30 @@ var db *gorm.DB
 
 // Initialize the database connection
 func initDB() {
-
 	var err error
-	dns := "root:@tcp(127.0.0.1:3306)/muse?charset=utf8&parseTime=true"
+
 	// Connect to the database
+	dns := "root:@tcp(127.0.0.1:3306)/?charset=utf8&parseTime=true"
 	db, err = gorm.Open(mysql.Open(dns), &gorm.Config{})
 	if err != nil {
 		panic("failed to connect database")
 	}
 
-	// Create a new database if one does not exist
-	err = db.Exec("CREATE DATABASE IF NOT EXISTS muse").Error
+	// Create the database if it doesn't already exist
+	err = db.Exec("CREATE DATABASE IF NOT EXISTS scape").Error
 	if err != nil {
 		panic("failed to create database")
 	}
 
+	// Use the database
+	dns = "root:@tcp(127.0.0.1:3306)/scape?charset=utf8&parseTime=true"
+	db, err = gorm.Open(mysql.Open(dns), &gorm.Config{})
+	if err != nil {
+		panic("failed to connect database")
+	}
+
 	// Migrate the schema
-	db.AutoMigrate(&User{})
-	db.AutoMigrate(&File{})
+	db.AutoMigrate(&User{}, &File{})
 }
 
 // Initialize the routes and handlers
@@ -68,6 +75,7 @@ func initRouter() {
 	// handlers for file routes
 	r.HandleFunc("/api/users/{id}/files", getFiles).Methods("GET")
 	r.HandleFunc("/api/users/{id}/files", createFile).Methods("POST")
+	r.HandleFunc("/api/users/{id}/files/upload", uploadFile).Methods("POST")
 	r.HandleFunc("/api/users/{id}/files/{fid}", updateFile).Methods("PUT")
 	r.HandleFunc("/api/users/{id}/files/{fid}", deleteFile).Methods("DELETE")
 
@@ -173,6 +181,52 @@ func deleteUser(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(map[string]string{"message": "user deleted"})
+}
+
+// handler for uploading a file to an account
+func uploadFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get the user ID from the URL parameter (e.g. /users/{id}/files)
+	params := mux.Vars(r)
+	userID := params["id"]
+
+	// Get the file from the request body
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error getting file"})
+		return
+	}
+	defer file.Close()
+
+	// Create a new file with the uploaded files properties
+	newFile := File{
+		Filename:  header.Filename,
+		Size:      header.Size,
+		Type:      header.Header.Get("Content-Type"),
+		OwnerID:   userID,
+		CreatedAt: time.Now().Unix(),
+	}
+
+	newFile.Data = make([]byte, newFile.Size) // Create a byte slice with the size of the file
+	_, err = file.Read(newFile.Data)          // Read the file into the byte slice
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error reading file data"})
+		return
+	}
+
+	// Create the file in the database
+	err = db.Create(&newFile).Error
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error creating file: " + err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newFile)
 }
 
 // handler to create a new file for a given user account
