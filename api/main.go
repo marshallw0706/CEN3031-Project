@@ -28,12 +28,12 @@ func main() {
 var DB *gorm.DB
 var err error
 
-const DSN = "root:password@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
+const DSN = "root:@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
 
 type User struct {
 	gorm.Model
-	Name  string `json:"name"`
-	Email string `json:"email"`
+	Username string `json:"username"`
+	Password string `json:"password"`
 }
 
 func InitialMigration() {
