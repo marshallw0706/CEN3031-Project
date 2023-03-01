@@ -1,15 +1,70 @@
 # Front-End:
 
-	Updated login/sign up pages and made sure they were connected with each other
-
-	Added a new ‘user profile’ page wheres users can view their profile and will eventually be able to edit and share it
-
-	A page with a navigation bar was created so that users can easily access other parts of the application
-
-	Cypress Test - For this sprint the test focused on ensuring that each of our pages were loading in correctly.
+	Updated login/sign up pages and made sure they were connected with each other. We also made sure to connect the back end
 	
-	Unit Test - 
+	with the front end for the login pages. Now when a user signs up or logins in, this information is stored in the back end. 
 
+	Added a new ‘user profile’ page wheres users can view their profile and will eventually be able to edit and share it. There
+	
+	is a place for a user to upload a photo as well.
+
+	A single page application with a navigation bar was created so that users can easily access other parts of the application. The 
+	
+	navigation bar will allow users to go to the home, profile, explore, and post part of the application. In this sprint, users
+	
+	can click between each tab and a small description of what they will hold in the future is provided. A logo was also added
+	
+	to the navigation bar. A component and route was declared for each of the tabs on the navigation bar.
+
+	Cypress Test - For this sprint the test focused on ensuring that each of our pages were loading in correctly. (The test itself was
+	
+	shown in the video)
+	
+	Unit Test - Below is the unit tests that were created for the front end. They are shown in greater detail in the video. All
+	
+	of these tests passed with no failures. 
+	
+	This tests whether or not the app runs (Provided by Angular automatically)
+	
+	  it('should create the app', () => {
+    		const fixture = TestBed.createComponent(AppComponent);
+   		const app = fixture.componentInstance;
+    		expect(app).toBeTruthy();
+  	  });
+	  
+	  This tests if the side bar was created. This is done in each one of the components  (Provided by Angular automatically)
+	  
+	  it('should create', () => {
+    		expect(component).toBeTruthy();
+          );
+	  
+	 This tests if when the profile tab is clicked the messsage displayed shows 
+	 
+ 	 it("testing header", ()=>{
+    		const data=fixture.nativeElement;
+   		expect(data.querySelector(".content").textContent).toContain("This is the users profile page")
+   	  })
+	  
+	 This tests if when the post tab is clicked the messsage displayed shows 
+	   
+	 it("testing header", ()=>{
+    		const data=fixture.nativeElement;
+   	 	expect(data.querySelector(".content").textContent).toContain("Here users will be able to post/upload music")
+	  })
+  
+        This tests if when the home tab is clicked the messsage displayed shows 
+	
+    	it("testing header", ()=>{
+   		 const data=fixture.nativeElement;
+    		 expect(data.querySelector(".content").textContent).toContain("This is the home page. Users will be able to see things 				         posted from people they follow.")
+ 	 })
+  
+   	This tests if when the explore tab is clicked the messsage displayed shows 
+	
+    	it("testing header", ()=>{
+    		const data=fixture.nativeElement;
+    		expect(data.querySelector(".content").textContent).toContain("This explore page holds posts/music from other artists 		     that 	          they do not follow")
+ 	 })
 
 # Backend:
 
