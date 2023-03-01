@@ -19,12 +19,33 @@ import { AppRoutingModule } from './app-routing.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
 import { UserProfileComponent } from './user-profile/user-profile.component';
 
+
+import { HeaderComponent } from './side-bar/header/header.component';
+import { SidenavComponent } from './side-bar/sidenav/sidenav.component';
+import { HomeComponent } from './side-bar/home/home.component';
+import { ProfileComponent } from './side-bar/profile/profile.component';
+import { MatSidenavModule} from '@angular/material/sidenav';
+import { MatMenuModule } from '@angular/material/menu';
+import { MatIconModule } from '@angular/material/icon';
+import { MatDividerModule } from '@angular/material/divider';
+import { MatListModule } from '@angular/material/list';
+import { PostComponent } from './side-bar/post/post.component';
+import { ExploreComponent } from './side-bar/explore/explore.component';
+import { SideBarComponent } from './side-bar/side-bar.component';
+
 @NgModule({
   declarations: [
     LoginPageComponent,
     SignupComponent,
     AppComponent,
-    UserProfileComponent
+    UserProfileComponent,
+    HeaderComponent,
+    SidenavComponent,
+    HomeComponent,
+    ProfileComponent,
+    PostComponent,
+    ExploreComponent,
+    SideBarComponent
 
   ],
   imports: [
@@ -39,7 +60,13 @@ import { UserProfileComponent } from './user-profile/user-profile.component';
     MatToolbarModule,
     RouterModule,
     AppRoutingModule,
-    FlexLayoutModule
+    FlexLayoutModule,
+    MatSidenavModule,
+    MatToolbarModule,
+    MatMenuModule,
+    MatIconModule,
+    MatDividerModule,
+    MatListModule,
 
   ],
   providers: [],

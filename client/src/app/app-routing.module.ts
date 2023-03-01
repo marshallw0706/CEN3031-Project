@@ -3,6 +3,8 @@ import { NgModule } from '@angular/core';
 import { RouterModule, Routes } from '@angular/router';
 import { LoginPageComponent } from './login-page/login-page.component';
 import { SignupComponent } from './signup-page/signup-page.component';
+import { HomeComponent } from './side-bar/home/home.component';
+import { SideBarComponent } from './side-bar/side-bar.component';
 
 const routes: Routes = [
   {
@@ -16,6 +18,10 @@ const routes: Routes = [
   {
     path: 'profile',
     component: UserProfileComponent
+  },
+  {
+    path: 'sidebar',
+    component: SideBarComponent
   }
 ];
 
