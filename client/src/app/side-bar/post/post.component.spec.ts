@@ -20,4 +20,9 @@ describe('PostComponent', () => {
   it('should create', () => {
     expect(component).toBeTruthy();
   });
+  
+  it("testing header", ()=>{
+    const data=fixture.nativeElement;
+    expect(data.querySelector(".content").textContent).toContain("Here users will be able to post/upload music")
+  })
 });
