@@ -70,6 +70,10 @@ import { SideBarComponent } from './side-bar/side-bar.component';
 
   ],
   providers: [],
-  bootstrap: [AppComponent]
+  bootstrap: [AppComponent],
+    schemas:[
+    CUSTOM_ELEMENTS_SCHEMA
+  
+  ]
 })
 export class AppModule { }
