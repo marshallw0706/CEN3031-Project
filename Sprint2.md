@@ -26,8 +26,7 @@
  **gorm.Model**:  Stores uint ID for identification, time.Time CreatedAt, time.Time UpdatedAt, and time.Time DeletedAt (initially null)<br><br>
  **username**: A string that identifies a user besides ID<br><br>
  **password**: A string to be used for login identification<br><br>
- 
- //add others
+ **files**: A collection of File structs attributed to the user<br><br>
  
  ## File Struct
  
