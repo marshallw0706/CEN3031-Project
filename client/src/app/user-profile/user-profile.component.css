@@ -1,0 +1,8 @@
+.profile-card {
+  max-width: 400px;
+}
+
+.profile-header-image {
+  background-image: url('../../assets/image/default-pfp.png');
+  background-size: cover;
+}

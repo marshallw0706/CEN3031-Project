@@ -17,12 +17,14 @@ import { SignupComponent } from './signup-page/signup-page.component';
 import { RouterModule } from '@angular/router'
 import { AppRoutingModule } from './app-routing.module';
 import { FlexLayoutModule } from '@angular/flex-layout';
+import { UserProfileComponent } from './user-profile/user-profile.component';
 
 @NgModule({
   declarations: [
     LoginPageComponent,
     SignupComponent,
-    AppComponent
+    AppComponent,
+    UserProfileComponent
 
   ],
   imports: [
