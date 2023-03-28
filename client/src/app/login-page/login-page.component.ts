@@ -2,6 +2,8 @@ import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { compare } from 'bcryptjs';
+
 
 interface User{
   username: string
@@ -31,7 +33,7 @@ export class LoginPageComponent {
     this.users = await lastValueFrom(users$)
     for(var user of this.users)
     {
-      if(user.username == this.username && user.password == this.password)
+      if(user.username == this.username && await compare(this.password, user.password))
       {
         this.success = true
       }
