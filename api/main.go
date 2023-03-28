@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"log"
 	"net/http"
+	"time"
 
 	"github.com/gorilla/mux"
 	"golang.org/x/crypto/bcrypt"
@@ -18,6 +19,12 @@ func initializeRouter() {
 	router.HandleFunc("/api/users", CreateUser).Methods("POST")
 	router.HandleFunc("/api/users/{id}", UpdateUser).Methods("PUT")
 	router.HandleFunc("/api/users/{id}", DeleteUser).Methods("DELETE")
+
+	router.HandleFunc("/api/users/{id}/files", getFiles).Methods("GET")
+	router.HandleFunc("/api/users/{id}/files", createFile).Methods("POST")
+	router.HandleFunc("/api/users/{id}/files/upload", uploadFile).Methods("POST")
+	router.HandleFunc("/api/users/{id}/files/{fid}", updateFile).Methods("PUT")
+	router.HandleFunc("/api/users/{id}/files/{fid}", deleteFile).Methods("DELETE")
 
 	log.Fatal(http.ListenAndServe(":5000", router))
 }
@@ -35,6 +42,17 @@ type User struct {
 	gorm.Model
 	Username string `json:"username"`
 	Password string `json:"password"`
+	Files    []File `json:"files" gorm:"foreignkey:OwnerID"`
+}
+
+type File struct {
+	gorm.Model
+	Filename  string `json:"filename" gorm:"not null"`
+	Size      int64  `json:"size" gorm:"not null"`
+	Type      string `json:"type" gorm:"not null"`
+	OwnerID   string `json:"owner_id" gorm:"not null"`
+	CreatedAt int64  `json:"created_at" gorm:"not null"`
+	Data      []byte `json:"data" gorm:"not null"`
 }
 
 func InitialMigration() {
@@ -42,7 +60,7 @@ func InitialMigration() {
 	if err != nil {
 		panic("Cannot connect to DB")
 	}
-	DB.AutoMigrate(&User{})
+	DB.AutoMigrate(&User{}, &File{})
 }
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -90,4 +108,172 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	DB.Delete(&user, params["id"])
 	json.NewEncoder(w).Encode("The User has been deleted")
+}
+
+// handler for uploading a file to an account
+func uploadFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	// Get the user ID from the URL parameter (e.g. /users/{id}/files)
+	params := mux.Vars(r)
+	userID := params["id"]
+
+	// Get the file from the request body
+	file, header, err := r.FormFile("file")
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error getting file"})
+		return
+	}
+	defer file.Close()
+
+	// Create a new file with the uploaded files properties
+	newFile := File{
+		Filename:  header.Filename,
+		Size:      header.Size,
+		Type:      header.Header.Get("Content-Type"),
+		OwnerID:   userID,
+		CreatedAt: time.Now().Unix(),
+	}
+
+	newFile.Data = make([]byte, newFile.Size) // Create a byte slice with the size of the file
+	_, err = file.Read(newFile.Data)          // Read the file into the byte slice
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error reading file data"})
+		return
+	}
+
+	// Create the file in the database
+	err = DB.Create(&newFile).Error
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error creating file: " + err.Error()})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newFile)
+}
+
+// handler to create a new file for a given user account
+func createFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var file File
+
+	// Decode the request body into the file struct
+	err := json.NewDecoder(r.Body).Decode(&file)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Validate the file input (e.g. check if filename or size is empty)
+	if file.Filename == "" || file.Size == 0 {
+		w.WriteHeader(http.StatusBadRequest)
+		json.NewEncoder(w).Encode(map[string]string{"message": "filename or size cannot be empty"})
+		return
+	}
+
+	// Get the owner ID from the URL parameter (e.g. /users/{id}/files)
+	params := mux.Vars(r)
+	ownerID := params["id"]
+
+	// Set the owner ID and created at fields for the file struct
+	file.OwnerID = ownerID
+
+	file.CreatedAt = time.Now().Unix()
+
+	// Create the file in the database
+	err = DB.Create(&file).Error
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error creating file"})
+		return
+	}
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(file) // Encode and send back the file as JSON response
+}
+
+// handler to get all files for a given user account
+func getFiles(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var files []File
+
+	// Get the owner ID from the URL parameter (e.g. /users/{id}/files)
+	params := mux.Vars(r)
+	ownerID := params["id"]
+
+	err := DB.Where("owner_id = ?", ownerID).Find(&files).Error // Find all files that belong to the owner in the database
+
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error getting files"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(files) // Encode and send back all files as JSON response
+}
+
+// handler to update a file for a given user account
+func updateFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var file File
+
+	// Decode the request body into the file struct
+	err := json.NewDecoder(r.Body).Decode(&file)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	// Get the owner ID and file ID from the URL parameter (e.g. /users/{id}/files/{fid})
+	params := mux.Vars(r)
+	ownerID := params["id"]
+	fileID := params["fid"]
+
+	err = DB.Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file).Error // Find the file that belongs to the owner and has the given ID in the database
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	// Update only non-empty fields of the file struct in the database
+	DB.Model(&file).Updates(file)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(file) // Encode and send back updated file as JSON response
+}
+
+// handler to delete a file for a given user account
+func deleteFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	var file File
+
+	// Get the owner ID and file ID from URL parameter (e.g. /users/{id}/files/{fid})
+	params := mux.Vars(r)
+	ownerID := params["id"]
+	fileID := params["fid"]
+
+	err := DB.Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file).Error // Find the file that belongs to owner and has given ID in database
+
+	if err != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	// Delete only non-empty fields of the file struct in the database
+	DB.Delete(&file)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "file deleted"}) // Encode and send back a confirmation message as JSON response
 }
