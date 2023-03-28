@@ -10,31 +10,58 @@
     
             <mat-form-field>
                 Email
-                <input matInput type="email">
+                <input matInput [(ngModel)] = "submitemail" [ngModelOptions]="{standalone: true}" matInput type="email">
             </mat-form-field>
 
             <mat-form-field>
                 Username
-                <input matInput type="username" >
+                <input matInput [(ngModel)] = "submitname" [ngModelOptions]="{standalone: true}" type="username" >
             </mat-form-field>
 
             <mat-form-field>
                 Password
-                <input matInput type="password">
+                <input matInput matInput [(ngModel)] = "submitpass" [ngModelOptions]="{standalone: true}" type="password">
             </mat-form-field>
 
             <mat-form-field>
                 Confirm Password
-                <input matInput type="confirm">
+                <input matInput matInput [(ngModel)] = "submitpass2" [ngModelOptions]="{standalone: true}" type="password">
             </mat-form-field>
 
-            <button mat-raised-button type="submit">Sign Up</button> 
+            <button mat-raised-button (click) = "addUser()" type="submit">Sign Up</button> 
 
             <p></p>
             <p></p>
             Already have an account?<button class="link" routerLink="">Sign in</button>
             </form>
             
+            <div>
+                <ng-container
+                *ngIf="passmatcherror; then error">
+        </ng-container>
+
+        <ng-container
+                *ngIf="emptyerror; then emperror">
+        </ng-container>
+
+        <ng-container
+                *ngIf="existinguser; then exerror">
+        </ng-container>
+        
+        <ng-template #error>
+            <div>ERROR: Passwords must match</div>
+        </ng-template>
+
+        <ng-template #emperror>
+            <div>ERROR: Fields are blank</div>
+        </ng-template>
+
+        <ng-template #exerror>
+            <div>ERROR: The username already exists</div>
+        </ng-template>
+        
+        </div>
 
     </mat-card>
+
 </div>

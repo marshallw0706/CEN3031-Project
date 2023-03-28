@@ -9,9 +9,6 @@ describe('SidenavComponent', () => {
   beforeEach(async () => {
     await TestBed.configureTestingModule({
       declarations: [ SidenavComponent ],
-      schemas:[
-          CUSTOM_ELEMENTS_SCHEMA
-        ],
     })
     .compileComponents();
 
