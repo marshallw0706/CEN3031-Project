@@ -28,6 +28,7 @@ func initializeRouter() {
 
 	log.Fatal(http.ListenAndServe(":5000", router))
 }
+
 func main() {
 	InitialMigration()
 	initializeRouter()
@@ -36,7 +37,7 @@ func main() {
 var DB *gorm.DB
 var err error
 
-const DSN = "root:NO@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
+const DSN = "root:@tcp(localhost:3306)/myDB?charset=utf8&parseTime=true"
 
 type User struct {
 	gorm.Model
@@ -223,30 +224,28 @@ func getFiles(w http.ResponseWriter, r *http.Request) {
 func updateFile(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
 
-	var file File
+	// Get the owner ID and file ID from the URL parameter (e.g. /users/{id}/files/{fid})
+	params := mux.Vars(r)
+	ownerID := params["id"]
+	fileID := params["fid"]
 
-	// Decode the request body into the file struct
+	var file File
+	result := DB.Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file) // Find the file that belongs to the owner and has the given ID in the database
+
+	if result.Error != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	// Decode the request body into the file struct and update only non-empty fields in the database
 	err := json.NewDecoder(r.Body).Decode(&file)
 	if err != nil {
 		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	// Get the owner ID and file ID from the URL parameter (e.g. /users/{id}/files/{fid})
-	params := mux.Vars(r)
-	ownerID := params["id"]
-	fileID := params["fid"]
-
-	err = DB.Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file).Error // Find the file that belongs to the owner and has the given ID in the database
-
-	if err != nil {
-		w.WriteHeader(http.StatusNotFound)
-		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
-		return
-	}
-
-	// Update only non-empty fields of the file struct in the database
-	DB.Model(&file).Updates(file)
+	DB.Save(&file)
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(file) // Encode and send back updated file as JSON response
