@@ -7,6 +7,7 @@ import { HomeComponent } from './side-bar/home/home.component';
 import { SideBarComponent } from './side-bar/side-bar.component';
 import { PostComponent } from './side-bar/post/post.component';
 import { ExploreComponent } from './side-bar/explore/explore.component';
+import { ProfileComponent } from './side-bar/profile/profile.component';
 
 const routes: Routes = [
   {
@@ -19,7 +20,7 @@ const routes: Routes = [
   },
   {
     path: 'profile',
-    component: UserProfileComponent
+    component: ProfileComponent
   },
   {
     path: 'sidebar',

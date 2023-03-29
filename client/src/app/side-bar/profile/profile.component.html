@@ -1,3 +1,39 @@
-<h1 class="content">This is the users profile page</h1>
+
+<mat-card>
+    <mat-card-header>
+      <mat-card-title>{{ profile.name }}</mat-card-title>
+      <mat-card-subtitle>{{ profile.jobTitle }}</mat-card-subtitle>
+      <button mat-icon-button (click)="toggleEditMode()">
+        <mat-icon>{{ editMode ? 'done' : 'edit' }}</mat-icon>
+      </button>
+    </mat-card-header>
+    <div *ngIf="!editMode">
+      <img mat-card-image [src]="profile.userImage">
+      <mat-card-content>
+        <p>{{ profile.description }}</p>
+      </mat-card-content>
+      <!-- <mat-card-actions>
+        <button mat-button>Follow</button>
+        <button mat-button>Message</button>
+      </mat-card-actions> -->
+    </div>
+    <div *ngIf="editMode">
+      <mat-form-field>
+        <input matInput placeholder="Name" [(ngModel)]="profile.name">
+      </mat-form-field>
+      <mat-form-field>
+        <input matInput placeholder="Job Title" [(ngModel)]="profile.jobTitle">
+      </mat-form-field>
+     
+      <mat-form-field>
+        <input type="file"(change)="onFileSelected($event)">
+      </mat-form-field>
+
+      <mat-form-field>
+        <textarea matInput placeholder="Description" [(ngModel)]="profile.description"></textarea>
+      </mat-form-field>
+    </div>
+  </mat-card>
+  
 
 
