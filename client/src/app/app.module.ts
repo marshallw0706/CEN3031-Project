@@ -32,6 +32,7 @@ import { MatListModule } from '@angular/material/list';
 import { PostComponent } from './side-bar/post/post.component';
 import { ExploreComponent } from './side-bar/explore/explore.component';
 import { SideBarComponent } from './side-bar/side-bar.component';
+import { SearchComponent } from './side-bar/search/search.component';
 
 @NgModule({
   declarations: [
@@ -45,7 +46,8 @@ import { SideBarComponent } from './side-bar/side-bar.component';
     ProfileComponent,
     PostComponent,
     ExploreComponent,
-    SideBarComponent
+    SideBarComponent,
+    SearchComponent
 
   ],
   imports: [

@@ -2,6 +2,7 @@ import { ComponentFixture, TestBed } from '@angular/core/testing';
 
 import { ExploreComponent } from './explore.component';
 
+
 describe('ExploreComponent', () => {
   let component: ExploreComponent;
   let fixture: ComponentFixture<ExploreComponent>;
@@ -26,3 +27,4 @@ describe('ExploreComponent', () => {
     expect(data.querySelector(".content").textContent).toContain("This explore page holds posts/music from other artists that they do not follow")
   })
 });
+

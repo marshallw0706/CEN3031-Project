@@ -1,1 +1,90 @@
 <h1 class="content">This explore page holds posts/music from other artists that they do not follow</h1>
+
+<div>
+    <app-search (searchTextChanged)="onSearchTextEntered($event)">Search</app-search>
+</div>
+
+<!-- <mat-list role="list">
+    <mat-list-item role="listitem">Item 1</mat-list-item>
+    <mat-list-item role="listitem">Item 2</mat-list-item>
+    <mat-list-item role="listitem">Item 3</mat-list-item>
+  </mat-list> -->
+
+
+<mat-nav-list>
+    <style>
+        .geek{
+            width: 100%;
+            height: 100%;
+            justify-content: center;
+        }
+        img{
+            width: 300px;
+            height: 100%;
+            object-fit:fill;
+        }
+    </style>
+    <div class="geek">
+        <button>
+        <img src="../../assets/image/higher.jpeg" alt="Sound Space">
+        <div class="wrap">
+            <textarea class="e-input" placeholder="Caption"></textarea>
+        </div>
+    </button>
+    </div>
+
+    <div>
+        <button>
+            <img src="../../assets/image/sky.jpeg" alt="">
+            <div class="wrap">
+                <textarea class="e-input" placeholder="Caption"></textarea>
+            </div>
+        </button>
+
+    </div>
+
+    <div>
+        <button>
+            <img src="../../assets/image/pain.jpeg" alt="">
+            <div class="wrap">
+                <textarea class="e-input" placeholder="Caption"></textarea>
+            </div>
+        </button>
+
+    </div>
+
+    <div>
+        <button>
+            <img src="../../assets/image/hop.jpeg" alt="">
+            <div class="wrap">
+                <textarea class="e-input" placeholder="Caption"></textarea>
+            </div>
+        </button>
+
+    </div>
+
+
+    <div>
+        <button>
+            <img src="../../assets/image/city.jpeg" alt="">
+            <div class="wrap">
+                <textarea class="e-input" placeholder="Caption"></textarea>
+            </div>
+        </button>
+
+    </div>
+
+
+
+    <div>
+        <button>
+            <img src="../../assets/image/sphere.jpeg" alt="">
+            <div class="wrap">
+                <textarea class="e-input" placeholder="Caption"></textarea>
+            </div>
+        </button>
+
+    </div>
+
+
+</mat-nav-list>

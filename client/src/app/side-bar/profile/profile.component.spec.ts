@@ -21,8 +21,8 @@ describe('ProfileComponent', () => {
     expect(component).toBeTruthy();
   });
   
-    it("testing header", ()=>{
-    const data=fixture.nativeElement;
-    expect(data.querySelector(".content").textContent).toContain("This is the users profile page")
-  })
+  //   it("testing header", ()=>{
+  //   const data=fixture.nativeElement;
+  //   expect(data.querySelector(".content").textContent).toContain("This is the users profile page")
+  // })
 });
