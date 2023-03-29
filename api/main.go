@@ -36,7 +36,7 @@ func main() {
 var DB *gorm.DB
 var err error
 
-const DSN = "root:@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
+const DSN = "root:NO@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
 
 type User struct {
 	gorm.Model
