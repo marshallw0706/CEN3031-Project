@@ -2,5 +2,5 @@
 <input type="file"
        (change)="onFileSelected($event)" #fileUpload>
 <div><button (click) = "uploadFile()">Post</button></div>
-<!--<img [src]="'data:' + filedisplay.type + ';base64,' + filedisplay.data" alt="Image">-->
+<!-- <img [src]="'data:' + filedisplay.type + ';base64,' + filedisplay.data" alt="Image"> -->
 <audio autoplay controls src="data:audio/mpeg;base64,{{filedisplay2.data}}"></audio>

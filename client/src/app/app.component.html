@@ -1,0 +1,17 @@
+<mat-toolbar-row> 
+    <p></p>
+    <h2 matSubheader class="nameSide">Sound Space</h2>
+  </mat-toolbar-row>
+  
+  
+  <mat-sidenav-container>
+    <mat-sidenav mode = "side" opened="true">
+      <app-sidenav></app-sidenav>
+    </mat-sidenav>
+  
+    <mat-sidenav-content>
+      <app-header></app-header>
+      <router-outlet></router-outlet>
+    </mat-sidenav-content>
+  
+  </mat-sidenav-container>

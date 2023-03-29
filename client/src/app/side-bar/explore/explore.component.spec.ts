@@ -17,12 +17,12 @@ describe('ExploreComponent', () => {
     fixture.detectChanges();
   });
 
-  //it('should create', () => {
-  //  expect(component).toBeTruthy();
-  //});
+  it('should create', () => {
+   expect(component).toBeTruthy();
+  });
   
-  //  it("testing header", ()=>{
-  //   const data=fixture.nativeElement;
-  //   expect(data.querySelector(".content").textContent).toContain("This explore page holds posts/music from other artists that they do not follow")
-  // })
+   it("testing header", ()=>{
+    const data=fixture.nativeElement;
+    expect(data.querySelector(".content").textContent).toContain("This explore page holds posts/music from other artists that they do not follow")
+  })
 });
