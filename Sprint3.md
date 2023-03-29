@@ -1,14 +1,101 @@
-Front-End
-
-- Profile page
-- Search bar in explore page
-- New logo 
-- New fonts downloaded
-- Explore page has template of what it should look like
-
-
 # Front-End:
 
+In this sprint, we worked on getting the api and client to work together and focused on making sure that the 
+
+login/sign up page worked together and that a user could create an account. In this sprint we also edited the profile
+
+page so that the user could edit it and put in their own personalized informaiton. The user will also have the capability to 
+
+upload there own profile image. We also edited the explore page to show how it will look like once the user logs in.
+
+This page was updated to hold posts from different artists that the user does not follow. Each post shown on the explore
+
+page is next to one another and is a button so that the user can click on it. Once the user clicks on a photo they will be sent to the profile of the artist. 
+
+There is also a caption box for the artist to write a small description. The explore page will also have a search bar so the user can look up a certain 
+
+artist or a genre of song. The logo on the home page was also updated. The post page was updated so
+
+that the user can choose a file and upload it. Once uploaded the user will either be able to see
+
+the image or be able to play the song due to the audio bar that created. We also added different fonts to our project so
+
+that we can use them in the future. 
+
+Unit Tests - Below is the unit tests that were created for the front end
+
+  async checkUser()
+  {
+    const users$ = await this.httpClient.get<User[]>('/api/users', {})
+    this.users = await lastValueFrom(users$)
+    for(var user of this.users)
+    {
+      if(user.username == this.username && await compare(this.password, user.password))
+      {
+        this.success = true
+      }
+    }
+    this.username = ''
+    this.password = ''
+    if(this.success)
+    {
+      this.router.navigate(['sidebar'])
+    }
+  }
+
+ it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+ 
+ it('should create', () => {
+   expect(component).toBeTruthy();
+  });
+  
+   it("testing header", ()=>{
+    const data=fixture.nativeElement;
+    expect(data.querySelector(".content").textContent).toContain("This explore page holds posts/music from other artists that they do not follow")
+  })
+
+   it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+  
+    it("testing header", ()=>{
+    const data=fixture.nativeElement;
+    expect(data.querySelector(".content").textContent).toContain("This is the home page. Users will be able to see things posted from people they follow.")
+  })
+
+   it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+  
+  it("testing header", ()=>{
+    const data=fixture.nativeElement;
+    expect(data.querySelector(".content").textContent).toContain("Here users will be able to post/upload music")
+  })
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+  it('should create the app', () => {
+    const fixture = TestBed.createComponent(SideBarComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it(should have as title 'homepage', () => {
+    const fixture = TestBed.createComponent(SideBarComponent);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('homepage');
+  });
+
+  it('should render title', () => {
+    const fixture = TestBed.createComponent(SideBarComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.content span')?.textContent).toContain('homepage app is running!');
+  });
 
 # Backend:
 
