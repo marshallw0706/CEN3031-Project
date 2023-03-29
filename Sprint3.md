@@ -1,3 +1,12 @@
+Front-End
+
+- Profile page
+- Search bar in explore page
+- New logo 
+- New fonts downloaded
+- Explore page has template of what it should look like
+
+
 # Front-End:
 
 
@@ -152,4 +161,3 @@
  **main()**: The entry point of the program. Calls **initialMigration** to set up database and **initializeRouter** to create handler functions.<br><br>
  **initialMigration()**: Opens a new MySQL server using GORM, panics on error. Automigrates users and files so tables are up to date.<br><br>
  **initializeRouter()**: Creates router using Gorilla MUX and desired functions. Listens on port :5000.<br><br>
-
