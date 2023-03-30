@@ -96,6 +96,37 @@ Unit Tests - Below is the unit tests that were created for the front end
     const compiled = fixture.nativeElement as HTMLElement;
     expect(compiled.querySelector('.content span')?.textContent).toContain('homepage app is running!');
   });
+  
+  Cypress Test:
+  describe('check login page', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200')
+  })
+})
+
+describe('check sign up page', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/signup')
+  })
+})
+
+describe('check sidebar', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/sidebar')
+  })
+})
+
+describe('check profile', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/profile')
+  })
+})
+
+describe('check post', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/post')
+  })
+})
 
 # Backend:
 
