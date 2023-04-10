@@ -90,11 +90,15 @@ input{
     width: 100%;
     background-color: rgba(255,255,255,0.07);
     border-radius: 3px;
+    box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.3);
     padding: 0 10px;
     margin-top: 8px;
     font-size: 14px;
     font-weight: 300;
 }
+.error {
+    box-shadow: inset 0 0 0 1px red;
+  }
 ::placeholder{
     color: #e5e5e5;
 }
@@ -143,10 +147,10 @@ button{
         <h3>Welcome Back!</h3>
 
         <label for="username">Username</label>
-        <input [(ngModel)] = "username" [ngModelOptions]="{standalone: true}" type="text" placeholder="Enter username" id="username">
+        <input [(ngModel)] = "username" [ngModelOptions]="{standalone: true}" [class.error]="turnred" type="text" placeholder="Enter username" id="username">
 
         <label for="password">Password</label>
-        <input [(ngModel)] = "password" [ngModelOptions]="{standalone: true}" type="password" placeholder="Password" id="password">
+        <input [(ngModel)] = "password" [ngModelOptions]="{standalone: true}" [class.error]="turnred" type="password" placeholder="Password" id="password">
 
         <button (click) = "checkUser()">Log In</button>
         <button routerLink="/signup">Sign Up</button>

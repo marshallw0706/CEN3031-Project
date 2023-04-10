@@ -20,6 +20,7 @@ interface User{
 export class LoginPageComponent {
   public username = ''
   public password = ''
+  public turnred = false
   public success = false
   
   public users: User[] = []
@@ -49,6 +50,11 @@ export class LoginPageComponent {
     if(this.success)
     {
       this.router.navigate(['sidebar'])
+    }
+    else
+    {
+      this.turnred = true
+      console.log("turn red")
     }
   }
   

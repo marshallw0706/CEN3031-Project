@@ -24,4 +24,13 @@ export class SideBarComponent implements OnInit {
       this.router.navigate([''])
     }
   }
+
+  logout()
+  {
+    GlobalConstants.loggedinuser = ''
+    GlobalConstants.loggedinid = 1n
+    GlobalConstants.loggedin = false
+    console.log("logout successful")
+    this.check()
+  }
 }
