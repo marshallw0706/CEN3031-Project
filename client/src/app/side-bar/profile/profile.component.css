@@ -6,3 +6,8 @@
     font-size: larger;
 }
 
+.profile-image {
+    width: 150px;
+    height: 150px;
+    object-fit: cover;
+  }

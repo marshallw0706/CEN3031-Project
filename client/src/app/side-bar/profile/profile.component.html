@@ -2,13 +2,14 @@
 <mat-card>
     <mat-card-header>
       <mat-card-title>{{ profile.name }}</mat-card-title>
+      <mat-card-subtitle>@{{ handle }}</mat-card-subtitle>
       <mat-card-subtitle>{{ profile.jobTitle }}</mat-card-subtitle>
       <button mat-icon-button (click)="toggleEditMode()">
         <mat-icon>{{ editMode ? 'done' : 'edit' }}</mat-icon>
       </button>
     </mat-card-header>
     <div *ngIf="!editMode">
-      <img mat-card-image [src]="profile.userImage">
+      <img mat-card-image [src]="profile.userImage" class="profile-image">
       <mat-card-content>
         <p>{{ profile.description }}</p>
       </mat-card-content>
@@ -24,10 +25,8 @@
       <mat-form-field>
         <input matInput placeholder="Job Title" [(ngModel)]="profile.jobTitle">
       </mat-form-field>
-     
-      <mat-form-field>
-        <input type="file"(change)="onFileSelected($event)">
-      </mat-form-field>
+        <input type="file"
+       (change)="onFileSelected($event)" #fileUpload>
 
       <mat-form-field>
         <textarea matInput placeholder="Description" [(ngModel)]="profile.description"></textarea>

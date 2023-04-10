@@ -1,4 +1,14 @@
 import { Component } from '@angular/core';
+import { GlobalConstants } from 'src/common/global-constants';
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { lastValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
+
+interface APIFile{
+	filename: string
+	type: string
+	data: string
+}
 
 @Component({
   selector: 'app-profile',
@@ -6,6 +16,14 @@ import { Component } from '@angular/core';
   styleUrls: ['./profile.component.css']
 })
 export class ProfileComponent {
+  public handle = GlobalConstants.loggedinuser
+  public files: APIFile[] = []
+  public uploadfile: File
+  constructor(
+    private httpClient: HttpClient,
+    private router: Router
+  ){}
+
   profile = {
     name: 'Sound Space  User',
     jobTitle: 'Master Musician',
@@ -14,16 +32,40 @@ export class ProfileComponent {
   };
   editMode = false;
 
-  onFileSelected(event: any) {
-    const file = event.target.files[0];
-    const reader = new FileReader();
-    reader.onload = () => {
-      this.profile.userImage = reader.result as string;
-    };
-    reader.readAsDataURL(file);
+  ngOnInit(): void {
+    this.getFiles()
+  }
+
+  onFileSelected(event) {
+    this.uploadfile = event.target.files[0]
+}
+
+  uploadFile()
+  {
+    const formData = new FormData()
+    formData.append('file', this.uploadfile)
+    this.httpClient.post("/api/users/"+GlobalConstants.loggedinid+"/files/upload", formData).subscribe()
+
   }
 
   toggleEditMode() {
     this.editMode = !this.editMode;
+  }
+
+  async getFiles()
+  {
+    const files$ = await this.httpClient.get<APIFile[]>('/api/users/1/files', {})
+    this.files = await lastValueFrom(files$)
+    for(var file of this.files)
+    {
+      if(file.type == "image/png" || file.type == "image/jpg"  && file.filename == "profilepic.png")
+      {
+        console.log("image recognized")
+        this.profile.userImage = "data:" + file.type + ";base64," + file.data
+        console.log(this.profile.userImage)
+      }
+      console.log(file.filename)
+    }
+    
   }
 }
