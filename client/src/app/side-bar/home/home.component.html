@@ -1,10 +1,3 @@
 
 
 <h1 class="content">This is the home page. Users will be able to see things posted from people they follow.</h1>
-
-<input type="file"
-       (change)="onFileSelected($event)" #fileUpload>
-<div><button (click) = "uploadFile()">Post</button></div>
-<div><button (click) = "getFiles()">Display Image</button></div>
-<img [src]="'data:' + filedisplay.type + ';base64,' + filedisplay.data" alt="Image">
-<audio autoplay controls src="data:audio/mpeg;base64,{{filedisplay2.data}}"></audio>

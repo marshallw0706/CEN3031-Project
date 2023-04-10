@@ -10,7 +10,7 @@ interface APIFile{
 }
 
 @Component({
-  selector: 'app-post',
+  selector: 'app-home',
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })

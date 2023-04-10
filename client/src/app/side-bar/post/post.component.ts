@@ -15,6 +15,8 @@ interface APIFile{
   styleUrls: ['./post.component.css']
 })
 export class PostComponent {
+  public audiodetected = false
+  public picturedetected = false
 
   public data = ''
   public files: APIFile[] = []
@@ -50,6 +52,8 @@ export class PostComponent {
   
   async getFiles()
   {
+    this.audiodetected = false
+    this.picturedetected = false
     const files$ = await this.httpClient.get<APIFile[]>('/api/users/1/files', {})
     this.files = await lastValueFrom(files$)
     for(var file of this.files)
@@ -57,11 +61,13 @@ export class PostComponent {
       if(file.type == "image/png")
       {
         console.log("image recognized")
+        this.picturedetected = true
         this.filedisplay = file
       }
       if(file.type == "audio/mpeg")
       {
         console.log("audio recognized")
+        this.audiodetected = true
         this.filedisplay2 = file
       }
       console.log(file.filename)

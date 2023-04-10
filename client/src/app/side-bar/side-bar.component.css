@@ -32,6 +32,33 @@ mat-sidenav-container{
     
 }
 
+.sidebar-text {
+    position: absolute;
+    top: 0;
+    right: 0;
+    margin-right: 16px;
+    padding: 16px;
+    background-color: #f0f0f0;
+  }
+
+  .big-text {
+    position: absolute;
+    top: 10%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 48px;
+    font-weight: bold;
+  }
+
+.parent-container {
+    text-align: center;
+  }
+  
+  .parent-container > * {
+    display: inline-block;
+    margin: 0 10px;
+  }
+
 
 
 

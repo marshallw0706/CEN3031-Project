@@ -3,9 +3,11 @@ import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 import { compare } from 'bcryptjs';
+import { GlobalConstants } from 'src/common/global-constants';
 
 
 interface User{
+  ID: BigInt
   username: string
   password: string
 }
@@ -36,6 +38,10 @@ export class LoginPageComponent {
       if(user.username == this.username && await compare(this.password, user.password))
       {
         this.success = true
+        GlobalConstants.loggedin = true
+        GlobalConstants.loggedinid = user.ID
+        GlobalConstants.loggedinuser = this.username
+
       }
     }
     this.username = ''
@@ -47,4 +53,3 @@ export class LoginPageComponent {
   }
   
 }
-

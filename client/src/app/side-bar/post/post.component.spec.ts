@@ -1,28 +1,78 @@
-import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { Component } from '@angular/core';
+import { HttpClient, HttpHeaders } from '@angular/common/http'
+import { lastValueFrom } from 'rxjs';
+import { Router } from '@angular/router';
 
-import { PostComponent } from './post.component';
+interface APIFile{
+	filename: string
+	type: string
+	data: string
+}
 
-describe('PostComponent', () => {
-  let component: PostComponent;
-  let fixture: ComponentFixture<PostComponent>;
+@Component({
+  selector: 'app-post',
+  templateUrl: './post.component.html',
+  styleUrls: ['./post.component.css']
+})
+export class PostComponent {
+  public audiodetected = false
+  public picturedetected = false
 
-  beforeEach(async () => {
-    await TestBed.configureTestingModule({
-      declarations: [ PostComponent ]
-    })
-    .compileComponents();
+  public data = ''
+  public files: APIFile[] = []
+  public fileName = ''
+  public uploadfile: File
+  public filedisplay: APIFile = {
+    filename: '',
+    type: '',
+    data: ''
+  }
+  public filedisplay2: APIFile = {
+    filename: '',
+    type: '',
+    data: ''
+  }
+  constructor(
+    private httpClient: HttpClient,
+    private router: Router
+  ){}
 
-    fixture = TestBed.createComponent(PostComponent);
-    component = fixture.componentInstance;
-    fixture.detectChanges();
-  });
+  onFileSelected(event) {
+    this.uploadfile = event.target.files[0]
+}
 
-  it('should create', () => {
-    expect(component).toBeTruthy();
-  });
+  uploadFile()
+  {
+    const formData = new FormData()
+    formData.append('file', this.uploadfile)
+    this.httpClient.post("/api/users/1/files/upload", formData).subscribe()
+
+  }
+
   
-  it("testing header", ()=>{
-    const data=fixture.nativeElement;
-    expect(data.querySelector(".content").textContent).toContain("Here users will be able to post/upload music")
-  })
-});
+  async getFiles()
+  {
+    this.audiodetected = false
+    this.picturedetected = false
+    const files$ = await this.httpClient.get<APIFile[]>('/api/users/1/files', {})
+    this.files = await lastValueFrom(files$)
+    for(var file of this.files)
+    {
+      if(file.type == "image/png")
+      {
+        console.log("image recognized")
+        this.picturedetected = true
+        this.filedisplay = file
+      }
+      if(file.type == "audio/mpeg")
+      {
+        console.log("audio recognized")
+        this.audiodetected = true
+        this.filedisplay2 = file
+      }
+      console.log(file.filename)
+    }
+    
+  }
+
+}

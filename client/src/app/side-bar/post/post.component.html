@@ -2,5 +2,21 @@
 <input type="file"
        (change)="onFileSelected($event)" #fileUpload>
 <div><button (click) = "uploadFile()">Post</button></div>
-<!-- <img [src]="'data:' + filedisplay.type + ';base64,' + filedisplay.data" alt="Image"> -->
-<audio autoplay controls src="data:audio/mpeg;base64,{{filedisplay2.data}}"></audio>
+<div><button (click) = "getFiles()">Display</button></div>
+<div>
+       <ng-container
+       *ngIf="audiodetected; then audio">
+</ng-container>
+
+<ng-container
+       *ngIf="picturedetected; then picture">
+</ng-container>
+
+<ng-template #audio>
+       <audio autoplay controls src="data:audio/mpeg;base64,{{filedisplay2.data}}"></audio>
+</ng-template>
+
+<ng-template #picture>
+       <img [src]="'data:' + filedisplay.type + ';base64,' + filedisplay.data" alt="Image">
+</ng-template>
+</div>
