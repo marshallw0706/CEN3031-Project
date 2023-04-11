@@ -67,6 +67,14 @@ mat-sidenav-container{
     padding: 8px 16px;
   }
 
+  .below-logout-button {
+    position: absolute;
+    top: 90px;
+    right: 0;
+    margin-right: 16px;
+    padding: 8px 16px;
+  }
+
 
 
 

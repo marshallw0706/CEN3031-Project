@@ -1,8 +1,34 @@
 export class GlobalConstants {
-    public static loggedinuser: string = ""
-      
-    public static loggedin: boolean = false
+    static get loggedinuser(): string {
+        return localStorage.getItem('loggedinuser') || '';
+      }
+    
+      static set loggedinuser(value: string) {
+        localStorage.setItem('loggedinuser', value);
+      }
+    
+      static get loggedin(): boolean {
+        return localStorage.getItem('loggedin') === 'true';
+      }
+    
+      static set loggedin(value: boolean) {
+        localStorage.setItem('loggedin', value.toString());
+      }
+    
+      static get loggedinid(): BigInt {
+        return BigInt(localStorage.getItem('loggedinid') || '1');
+      }
+    
+      static set loggedinid(value: BigInt) {
+        localStorage.setItem('loggedinid', value.toString());
+      }
 
-    public static loggedinid: BigInt = 1n
+      static get viewprofileid(): BigInt {
+        return BigInt(localStorage.getItem('viewprofileid') || '1');
+      }
+    
+      static set viewprofileid(value: BigInt) {
+        localStorage.setItem('viewprofileid', value.toString());
+      }
 
 }

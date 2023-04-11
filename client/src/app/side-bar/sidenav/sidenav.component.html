@@ -18,7 +18,7 @@
 
     <a mat-list-item  class="homeSide" routerLinkActive="list-item-active"><mat-icon>home</mat-icon> Home</a>
    
-    <a mat-list-item routerLink="/profile" routerLinkActive="list-item-active">
+    <a mat-list-item (click) = "setRoute()" routerLink="/profile" routerLinkActive="list-item-active">
         <mat-icon>dashboard</mat-icon> Profile
     </a>
 

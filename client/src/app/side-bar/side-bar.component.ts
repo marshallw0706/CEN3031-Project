@@ -33,4 +33,12 @@ export class SideBarComponent implements OnInit {
     console.log("logout successful")
     this.check()
   }
+
+  visit()
+  {
+    console.log("In visit with user id " + GlobalConstants.loggedinid)
+    GlobalConstants.viewprofileid = 1n
+    console.log("In visit with user id " + GlobalConstants.loggedinid)
+    this.router.navigate(['/profile'])
+  }
 }
