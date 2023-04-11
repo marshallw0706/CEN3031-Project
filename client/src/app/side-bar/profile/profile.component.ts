@@ -5,6 +5,7 @@ import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
 
 interface APIFile{
+  ID: BigInt
 	filename: string
 	type: string
 	data: string
@@ -19,6 +20,8 @@ export class ProfileComponent {
   public handle = GlobalConstants.loggedinuser
   public files: APIFile[] = []
   public uploadfile: File
+  public mostrecentfiletype: string
+  public mostrecentfileid: BigInt
   constructor(
     private httpClient: HttpClient,
     private router: Router
@@ -44,7 +47,20 @@ export class ProfileComponent {
   {
     const formData = new FormData()
     formData.append('file', this.uploadfile)
-    this.httpClient.post("/api/users/"+GlobalConstants.loggedinid+"/files/upload", formData).subscribe()
+    this.httpClient.post("/api/users/"+GlobalConstants.loggedinid+"/files/upload", formData).subscribe(
+      (response: any) => {this.mostrecentfileid = response.ID; 
+      this.mostrecentfiletype = response.type;
+    if(this.mostrecentfiletype != "image/png" && this.mostrecentfiletype != "image/jpg" && this.mostrecentfiletype != "image/jpeg")
+    {
+      console.log(this.mostrecentfiletype + " not a valid type, deleting now")
+      this.httpClient.delete("/api/users/"+GlobalConstants.loggedinid+"/files/"+this.mostrecentfileid, {}).subscribe()
+    }
+    else{
+    this.httpClient.put("/api/users/"+GlobalConstants.loggedinid+"/files/"+this.mostrecentfileid, {"filename": "profilepic.png"}).subscribe()
+    }
+    this.getFiles()}, 
+      (error) => console.log("bad")
+    )
 
   }
 
@@ -58,13 +74,12 @@ export class ProfileComponent {
     this.files = await lastValueFrom(files$)
     for(var file of this.files)
     {
-      if(file.type == "image/png" || file.type == "image/jpg"  && file.filename == "profilepic.png")
+      if((file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg")  && file.filename == "profilepic.png")
       {
         console.log("image recognized")
         this.profile.userImage = "data:" + file.type + ";base64," + file.data
         console.log(this.profile.userImage)
       }
-      console.log(file.filename)
     }
     
   }

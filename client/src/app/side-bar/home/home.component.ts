@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { GlobalConstants } from 'src/common/global-constants';
 
 interface APIFile{
+  ID: BigInt
 	filename: string
 	type: string
 	data: string

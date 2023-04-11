@@ -4,4 +4,5 @@ export class GlobalConstants {
     public static loggedin: boolean = false
 
     public static loggedinid: BigInt = 1n
+
 }

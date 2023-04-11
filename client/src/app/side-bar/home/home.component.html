@@ -9,7 +9,7 @@
     <img [src]="'data:' + file.type + ';base64,' + file.data" alt="Image" width="300px">
   </div>
 
-  <div *ngIf="file.type.startsWith('image') && (file.filename == 'profilepic.png' || file.filename == 'profilepic.jpeg')">
+  <div *ngIf="file.type.startsWith('image') && (file.filename == 'profilepic.png')">
     <h3>@{{ user }} updated their profile picture!</h3>
     <img [src]="'data:' + file.type + ';base64,' + file.data" alt="Image" width="300px">
   </div>

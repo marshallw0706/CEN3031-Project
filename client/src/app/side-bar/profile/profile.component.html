@@ -4,7 +4,7 @@
       <mat-card-title>{{ profile.name }}</mat-card-title>
       <mat-card-subtitle>@{{ handle }}</mat-card-subtitle>
       <mat-card-subtitle>{{ profile.jobTitle }}</mat-card-subtitle>
-      <button mat-icon-button (click)="toggleEditMode()">
+      <button mat-icon-button (click)="toggleEditMode()" (click)="uploadFile()">
         <mat-icon>{{ editMode ? 'done' : 'edit' }}</mat-icon>
       </button>
     </mat-card-header>
