@@ -54,7 +54,7 @@ export class ProfileComponent {
 
   async getFiles()
   {
-    const files$ = await this.httpClient.get<APIFile[]>('/api/users/1/files', {})
+    const files$ = await this.httpClient.get<APIFile[]>('/api/users/'+GlobalConstants.loggedinid+'/files', {})
     this.files = await lastValueFrom(files$)
     for(var file of this.files)
     {

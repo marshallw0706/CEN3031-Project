@@ -1,7 +1,8 @@
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { GlobalConstants } from 'src/common/global-constants';
 
 interface APIFile{
 	filename: string
@@ -14,59 +15,26 @@ interface APIFile{
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent {
-
-  public data = ''
+export class HomeComponent implements OnInit{
+  public user = GlobalConstants.loggedinuser
   public files: APIFile[] = []
-  public fileName = ''
+  public reversedFiles: APIFile[] = [];
   public uploadfile: File
-  public filedisplay: APIFile = {
-    filename: '',
-    type: '',
-    data: ''
-  }
-  public filedisplay2: APIFile = {
-    filename: '',
-    type: '',
-    data: ''
-  }
   constructor(
     private httpClient: HttpClient,
     private router: Router
   ){}
 
-  onFileSelected(event) {
-    this.uploadfile = event.target.files[0]
-}
-
-  uploadFile()
-  {
-    const formData = new FormData()
-    formData.append('file', this.uploadfile)
-    this.httpClient.post("/api/users/1/files/upload", formData).subscribe()
-
+  ngOnInit(): void {
+    this.getFiles()
   }
-
   
   async getFiles()
   {
-    const files$ = await this.httpClient.get<APIFile[]>('/api/users/1/files', {})
+    const files$ = await this.httpClient.get<APIFile[]>('/api/users/'+GlobalConstants.loggedinid+'/files', {})
     this.files = await lastValueFrom(files$)
-    for(var file of this.files)
-    {
-      if(file.type == "image/png")
-      {
-        console.log("image recognized")
-        this.filedisplay = file
-      }
-      if(file.type == "audio/mpeg")
-      {
-        console.log("audio recognized")
-        this.filedisplay2 = file
-      }
-      console.log(file.filename)
-    }
-    
+    this.reversedFiles = this.files.slice().reverse();
+
   }
 
 }

@@ -2,6 +2,7 @@ import { Component } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
+import { GlobalConstants } from 'src/common/global-constants';
 
 interface APIFile{
 	filename: string
@@ -45,7 +46,7 @@ export class PostComponent {
   {
     const formData = new FormData()
     formData.append('file', this.uploadfile)
-    this.httpClient.post("/api/users/1/files/upload", formData).subscribe()
+    this.httpClient.post("/api/users/"+GlobalConstants.loggedinid+"/files/upload", formData).subscribe()
 
   }
 
@@ -54,7 +55,7 @@ export class PostComponent {
   {
     this.audiodetected = false
     this.picturedetected = false
-    const files$ = await this.httpClient.get<APIFile[]>('/api/users/1/files', {})
+    const files$ = await this.httpClient.get<APIFile[]>("/api/users/"+GlobalConstants.loggedinid+"/files", {})
     this.files = await lastValueFrom(files$)
     for(var file of this.files)
     {
@@ -72,6 +73,7 @@ export class PostComponent {
       }
       console.log(file.filename)
     }
+    console.log("In files")
     
   }
 

@@ -1,3 +1,44 @@
 
 
-<h1 class="content">This is the home page. Users will be able to see things posted from people they follow.</h1>
+<h1 class="content">Here's what you missed:</h1>
+
+<div *ngFor="let file of reversedFiles">
+    <mat-card>
+  <div *ngIf="file.type.startsWith('image') && (file.filename != 'profilepic.png' && file.filename != 'profilepic.jpeg')">
+    <h3>@{{ user }} posted a new image!</h3>
+    <img [src]="'data:' + file.type + ';base64,' + file.data" alt="Image" width="300px">
+  </div>
+
+  <div *ngIf="file.type.startsWith('image') && (file.filename == 'profilepic.png' || file.filename == 'profilepic.jpeg')">
+    <h3>@{{ user }} updated their profile picture!</h3>
+    <img [src]="'data:' + file.type + ';base64,' + file.data" alt="Image" width="300px">
+  </div>
+
+  <div *ngIf="file.type.startsWith('audio')">
+    <h3>@{{ user }} posted a new track!</h3>
+    <audio controls [src]="'data:' + file.type + ';base64,' + file.data"></audio>
+  </div>
+
+  <mat-card-actions>
+    <button mat-button>
+      <mat-icon>favorite</mat-icon> Like
+    </button>
+  </mat-card-actions>
+
+  <mat-card-content>
+    <mat-form-field>
+      <textarea matInput placeholder="Add a comment..."></textarea>
+    </mat-form-field>
+    <button mat-button>Post Comment</button>
+  </mat-card-content>
+</mat-card>
+
+</div>
+
+<mat-card>
+    <div>
+      <h3>@soundspace posted a new image!</h3>
+      <img src="../../assets/image/pain.jpeg" alt="Image" width="300px">
+      <div>Today's Creator spotlight is Ryan Jones! Check out his new album Pain!</div>
+    </div>
+</mat-card>
