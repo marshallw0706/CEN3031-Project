@@ -20,6 +20,9 @@ func initializeRouter() {
 	router.HandleFunc("/api/users/{id}", UpdateUser).Methods("PUT")
 	router.HandleFunc("/api/users/{id}", DeleteUser).Methods("DELETE")
 
+	router.HandleFunc("/api/users/{id}/profile", UpdateProfileInfo).Methods("PUT")
+	router.HandleFunc("/api/users/{id}/profile", GetProfileInfo).Methods("GET")
+
 	router.HandleFunc("/api/users/{id}/files", getFiles).Methods("GET")
 	router.HandleFunc("/api/users/{id}/files", createFile).Methods("POST")
 	router.HandleFunc("/api/users/{id}/files/upload", uploadFile).Methods("POST")
@@ -41,9 +44,10 @@ const DSN = "root:@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
 
 type User struct {
 	gorm.Model
-	Username string `json:"username"`
-	Password string `json:"password"`
-	Files    []File `json:"files" gorm:"foreignkey:OwnerID"`
+	Username    string        `json:"username"`
+	Password    string        `json:"password"`
+	Files       []File        `json:"files" gorm:"foreignkey:OwnerID"`
+	ProfileInfo ProfileStruct `json:"profileinfo"  gorm:"foreignkey:OwnerID"`
 }
 
 type File struct {
@@ -54,6 +58,14 @@ type File struct {
 	OwnerID   string `json:"owner_id" gorm:"not null"`
 	CreatedAt int64  `json:"created_at" gorm:"not null"`
 	Data      []byte `json:"data" gorm:"not null"`
+	Likes     int64  `json:"likes" gorm:"not null"`
+}
+
+type ProfileStruct struct {
+	OwnerID     uint   `json:"owner_id" gorm:"not null"`
+	Name        string `json:"name"`
+	JobTitle    string `json:"jobtitle"`
+	Description string `json:"description"`
 }
 
 func InitialMigration() {
@@ -61,7 +73,7 @@ func InitialMigration() {
 	if err != nil {
 		panic("Cannot connect to DB")
 	}
-	DB.AutoMigrate(&User{}, &File{})
+	DB.AutoMigrate(&User{}, &File{}, &ProfileStruct{})
 }
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -89,6 +101,13 @@ func CreateUser(w http.ResponseWriter, r *http.Request) {
 	}
 	user.Password = string(hashedPassword)
 	DB.Create(&user)
+	profile := ProfileStruct{
+		OwnerID: user.ID,
+	}
+	DB.Create(&profile)
+
+	user.ProfileInfo = profile
+
 	json.NewEncoder(w).Encode(user)
 }
 
@@ -109,6 +128,47 @@ func DeleteUser(w http.ResponseWriter, r *http.Request) {
 	var user User
 	DB.Delete(&user, params["id"])
 	json.NewEncoder(w).Encode("The User has been deleted")
+}
+
+func UpdateProfileInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	var profile ProfileStruct
+	DB.Where("owner_id = ?", params["id"]).First(&profile)
+
+	var updatedProfile ProfileStruct
+	if err := json.NewDecoder(r.Body).Decode(&updatedProfile); err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	if updatedProfile.Name != "" {
+		profile.Name = updatedProfile.Name
+	}
+	if updatedProfile.JobTitle != "" {
+		profile.JobTitle = updatedProfile.JobTitle
+	}
+	if updatedProfile.Description != "" {
+		profile.Description = updatedProfile.Description
+	}
+
+	DB.Model(&profile).Where("owner_id = ?", profile.OwnerID).Updates(profile)
+	json.NewEncoder(w).Encode(profile)
+}
+
+func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+	var profile ProfileStruct
+	result := DB.Where("owner_id = ?", params["id"]).First(&profile)
+
+	if result.Error != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "profile not found"})
+		return
+	}
+
+	json.NewEncoder(w).Encode(profile)
 }
 
 // handler for uploading a file to an account

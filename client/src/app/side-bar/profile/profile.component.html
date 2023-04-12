@@ -20,16 +20,16 @@
     </div>
     <div *ngIf="editMode">
       <mat-form-field>
-        <input matInput placeholder="Name" [(ngModel)]="profile.name">
+        <input matInput placeholder="Name" [(ngModel)]="profile.name" [ngModelOptions]="{standalone: true}">
       </mat-form-field>
       <mat-form-field>
-        <input matInput placeholder="Job Title" [(ngModel)]="profile.jobTitle">
+        <input matInput placeholder="Job Title" [(ngModel)]="profile.jobTitle" [ngModelOptions]="{standalone: true}">
       </mat-form-field>
         <input type="file"
        (change)="onFileSelected($event)" #fileUpload>
 
       <mat-form-field>
-        <textarea matInput placeholder="Description" [(ngModel)]="profile.description"></textarea>
+        <textarea matInput placeholder="Description" [(ngModel)]="profile.description" [ngModelOptions]="{standalone: true}"></textarea>
       </mat-form-field>
     </div>
   </mat-card>

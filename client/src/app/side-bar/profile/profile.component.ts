@@ -17,6 +17,12 @@ interface User{
   password: string
 }
 
+interface ProfileInfo{
+  name: string
+  jobtitle: string
+  description: string
+}
+
 @Component({
   selector: 'app-profile',
   templateUrl: './profile.component.html',
@@ -27,6 +33,7 @@ export class ProfileComponent {
   public handle: string
   public files: APIFile[] = []
   public user: User
+  public profileinfo: ProfileInfo
   public uploadfile: File
   public mostrecentfiletype: string
   public mostrecentfileid: BigInt
@@ -81,6 +88,14 @@ export class ProfileComponent {
   }
 
   toggleEditMode() {
+    if(this.editMode)
+    {
+      this.httpClient.put("/api/users/"+GlobalConstants.viewprofileid+"/profile", {
+        "name": this.profile.name,
+        "jobtitle": this.profile.jobTitle,
+        "description": this.profile.description
+    }).subscribe((response: any) => console.log("good update profileinfo => " + response + " name: " + response.name), (error) => console.log("bad update profileinfo " + error))
+    }
     this.editMode = !this.editMode;
   }
 
@@ -97,6 +112,15 @@ export class ProfileComponent {
         console.log(this.profile.userImage)
       }
     }
+    const profileinfo$ = await this.httpClient.get<ProfileInfo>('/api/users/'+GlobalConstants.viewprofileid+'/profile', {})
+    this.profileinfo = await lastValueFrom(profileinfo$)
+    console.log("this is " + this.profileinfo.name)
+    if(this.profileinfo.description != "")
+      this.profile.description = this.profileinfo.description
+    if(this.profileinfo.jobtitle != "")
+      this.profile.jobTitle = this.profileinfo.jobtitle
+    if(this.profileinfo.name != "")
+      this.profile.name = this.profileinfo.name
     
   }
 }
