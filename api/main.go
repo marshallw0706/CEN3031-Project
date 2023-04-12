@@ -23,6 +23,13 @@ func initializeRouter() {
 	router.HandleFunc("/api/users/{id}/profile", UpdateProfileInfo).Methods("PUT")
 	router.HandleFunc("/api/users/{id}/profile", GetProfileInfo).Methods("GET")
 
+	router.HandleFunc("/api/users/{id}/follow/{fid}", addFollower).Methods("POST")
+	router.HandleFunc("/api/users/{id}/unfollow/{fid}", removeFollower).Methods("DELETE")
+	router.HandleFunc("/api/users/{id}/following", getFollowingUsers).Methods("GET")
+	router.HandleFunc("/api/users/{uid}/like/{id}/{fid}", likeFile).Methods("POST")
+	router.HandleFunc("/api/users/{uid}/unlike/{id}/{fid}", unlikeFile).Methods("DELETE")
+	router.HandleFunc("/api/users/{id}/files/{fid}/likedby", getLikedByUsers).Methods("GET")
+
 	router.HandleFunc("/api/users/{id}/files", getFiles).Methods("GET")
 	router.HandleFunc("/api/users/{id}/files", createFile).Methods("POST")
 	router.HandleFunc("/api/users/{id}/files/upload", uploadFile).Methods("POST")
@@ -48,6 +55,7 @@ type User struct {
 	Password    string        `json:"password"`
 	Files       []File        `json:"files" gorm:"foreignkey:OwnerID"`
 	ProfileInfo ProfileStruct `json:"profileinfo"  gorm:"foreignkey:OwnerID"`
+	Following   []User        `json:"following" gorm:"many2many:user_followers"`
 }
 
 type File struct {
@@ -59,6 +67,7 @@ type File struct {
 	CreatedAt int64  `json:"created_at" gorm:"not null"`
 	Data      []byte `json:"data" gorm:"not null"`
 	Likes     int64  `json:"likes" gorm:"not null"`
+	LikedBy   []User `json:"likedby" gorm:"many2many:file_likes"`
 }
 
 type ProfileStruct struct {
@@ -169,6 +178,169 @@ func GetProfileInfo(w http.ResponseWriter, r *http.Request) {
 	}
 
 	json.NewEncoder(w).Encode(profile)
+}
+
+func addFollower(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	var user, follower User
+	DB.First(&user, params["id"])
+	DB.First(&follower, params["fid"])
+
+	if user.ID == 0 || follower.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "user or follower not found"})
+		return
+	}
+
+	err := DB.Model(&user).Association("Following").Append(&follower)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error adding follower"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
+func removeFollower(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	var user, follower User
+	DB.First(&user, params["id"])
+	DB.First(&follower, params["fid"])
+
+	if user.ID == 0 || follower.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "user or follower not found"})
+		return
+	}
+
+	err := DB.Model(&user).Association("Following").Delete(&follower)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error removing follower"})
+		return
+	}
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(user)
+}
+
+func likeFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	var user User
+	var file File
+	DB.First(&user, params["uid"])
+	ownerID := params["id"]
+	fileID := params["fid"]
+
+	result := DB.Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file)
+	if result.Error != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	err := DB.Model(&file).Association("LikedBy").Append(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error liking file"})
+		return
+	}
+
+	file.Likes++
+	DB.Save(&file)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(file)
+}
+
+func unlikeFile(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	var user User
+	var file File
+	DB.First(&user, params["uid"])
+	ownerID := params["id"]
+	fileID := params["fid"]
+	result := DB.Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file)
+	if result.Error != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	err := DB.Model(&file).Association("LikedBy").Delete(&user)
+	if err != nil {
+		w.WriteHeader(http.StatusInternalServerError)
+		json.NewEncoder(w).Encode(map[string]string{"message": "error unliking file"})
+		return
+	}
+
+	file.Likes--
+	DB.Save(&file)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(file)
+}
+
+func getFollowingUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	var user User
+	DB.First(&user, params["id"])
+	DB.Preload("Following").First(&user, params["id"])
+
+	if user.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "user not found"})
+		return
+	}
+
+	var followingUsers []User
+	for _, followingUserID := range user.Following {
+		var followingUser User
+		DB.First(&followingUser, followingUserID)
+		followingUsers = append(followingUsers, followingUser)
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(followingUsers)
+}
+
+func getLikedByUsers(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+
+	params := mux.Vars(r)
+	var file File
+	ownerID := params["id"]
+	fileID := params["fid"]
+	DB.Preload("LikedBy").Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file)
+	result := DB.Where("owner_id = ? AND id = ?", ownerID, fileID).First(&file)
+	if result.Error != nil {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	var likedByUsers []User
+	for _, likedByUserID := range file.LikedBy {
+		var likedByUser User
+		DB.First(&likedByUser, likedByUserID)
+		if likedByUser.ID != 0 {
+			likedByUsers = append(likedByUsers, likedByUser)
+		}
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(likedByUsers)
 }
 
 // handler for uploading a file to an account
