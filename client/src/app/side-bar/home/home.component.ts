@@ -19,6 +19,8 @@ interface APIFile{
   likes: number
   likedby: User[]
   liked: boolean
+  handle: string
+  created_at: BigInt
 }
 
 @Component({
@@ -27,10 +29,12 @@ interface APIFile{
   styleUrls: ['./home.component.css']
 })
 export class HomeComponent implements OnInit{
-  public user = GlobalConstants.loggedinuser
   public files: APIFile[] = []
+  public usersfiles: APIFile[] = []
   public currlikes: number
+  public user: User
   public currlikedby: User[]
+  public users: User[]
   public reversedFiles: APIFile[] = [];
   public uploadfile: File
   constructor(
@@ -46,9 +50,27 @@ export class HomeComponent implements OnInit{
   {
     const files$ = await this.httpClient.get<APIFile[]>('/api/users/'+GlobalConstants.loggedinid+'/files', {})
     this.files = await lastValueFrom(files$)
+    const users$ = await this.httpClient.get<User[]>('/api/users/'+GlobalConstants.loggedinid+'/following', {})
+    this.users = await lastValueFrom(users$)
+    if(this.users != null)
+    {
+    for(var user of this.users)
+    {
+      const usersfiles$ = await this.httpClient.get<APIFile[]>('/api/users/'+user.ID+'/files', {})
+      this.usersfiles = await lastValueFrom(usersfiles$)
+      if(this.usersfiles != null)
+      {
+        console.log("Attempting to add files")
+        this.files = this.files.concat(this.usersfiles)
+      }
+    }
+  }
     for(var file of this.files)
     {
-      const currlikedby$ = await this.httpClient.get<User[]>('/api/users/'+GlobalConstants.loggedinid+'/files/'+file.ID+'/likedby', {})
+      const user$ = this.httpClient.get<User>('/api/users/'+file.owner_id, {})
+      this.user = await lastValueFrom(user$)
+      file.handle = this.user.username
+      const currlikedby$ = await this.httpClient.get<User[]>('/api/users/'+file.owner_id+'/files/'+file.ID+'/likedby', {})
       this.currlikedby = await lastValueFrom(currlikedby$)
       if(this.currlikedby != null)
       {
@@ -67,7 +89,15 @@ export class HomeComponent implements OnInit{
         file.liked = false
       }
     }
-    this.reversedFiles = this.files.slice().reverse();
+    this.reversedFiles = this.files.sort((a, b) => {
+      if (a.created_at < b.created_at) {
+        return 1;
+      }
+      if (a.created_at > b.created_at) {
+        return -1;
+      }
+      return 0;
+    });
 
   }
 
@@ -88,7 +118,12 @@ export class HomeComponent implements OnInit{
       (error) => console.log("failure to unlike: " + error)
     );
   }
+}
 
+  gotoprofile(id: string)
+  {
+    GlobalConstants.viewprofileid = BigInt(id)
+    this.router.navigate(['profile'])
   }
 
 }
