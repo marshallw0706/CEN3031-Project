@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { GlobalConstants } from 'src/common/global-constants';
 
 @Component({
@@ -7,6 +7,8 @@ import { GlobalConstants } from 'src/common/global-constants';
   styleUrls: ['./sidenav.component.css']
 })
 export class SidenavComponent {
+  @Output() onPostButtonClick = new EventEmitter<void>()
+  @Output() onHomeButtonClick = new EventEmitter<void>();
   setRoute()
   {
     console.log("setroute")

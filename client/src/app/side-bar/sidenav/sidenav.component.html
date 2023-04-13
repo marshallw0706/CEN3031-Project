@@ -16,7 +16,7 @@
     <mat-divider></mat-divider>
     
 
-    <a mat-list-item  class="homeSide" routerLinkActive="list-item-active"><mat-icon>home</mat-icon> Home</a>
+    <a mat-list-item  class="homeSide" (click)="onHomeButtonClick.emit()" routerLinkActive="list-item-active"><mat-icon>home</mat-icon> Home</a>
    
     <a mat-list-item (click) = "setRoute()" routerLink="/profile" routerLinkActive="list-item-active">
         <mat-icon>dashboard</mat-icon> Profile
@@ -24,7 +24,7 @@
 
     <a mat-list-item class="exploreSide" routerLink="/explore" routerLinkActive="list-item-active"> <mat-icon>explore</mat-icon> Explore Music </a>
 
-    <a mat-list-item class="postSide" routerLink="/post" routerLinkActive="list-item-active"><mat-icon>microphone</mat-icon> Post </a>
+    <a mat-list-item class="postSide" (click)="onPostButtonClick.emit()" routerLinkActive="list-item-active"><mat-icon>microphone</mat-icon> Post </a>
 
 </mat-nav-list>
 

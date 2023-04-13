@@ -61,7 +61,7 @@ mat-sidenav-container{
 
   .logout-button {
     position: absolute;
-    top: 50px;
+    top: 52px;
     right: 0;
     margin-right: 16px;
     padding: 8px 16px;
@@ -73,6 +73,15 @@ mat-sidenav-container{
     right: 0;
     margin-right: 16px;
     padding: 8px 16px;
+  }
+
+  app-post {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 10;
+    width: 97%;
+    padding: 16px;
   }
 
 

@@ -1,22 +1,14 @@
-<h1 class="content">Here users will be able to post/upload music</h1>
-<input type="file"
-       (change)="onFileSelected($event)" #fileUpload>
-<div><button (click) = "uploadFile()">Post</button></div>
-<div><button (click) = "getFiles()">Display</button></div>
-<div>
-       <ng-container
-       *ngIf="audiodetected; then audio">
-</ng-container>
-
-<ng-container
-       *ngIf="picturedetected; then picture">
-</ng-container>
-
-<ng-template #audio>
-       <audio autoplay controls src="data:audio/mpeg;base64,{{filedisplay2.data}}"></audio>
-</ng-template>
-
-<ng-template #picture>
-       <img [src]="'data:' + filedisplay.type + ';base64,' + filedisplay.data" alt="Image">
-</ng-template>
-</div>
+<mat-card>
+       <h1>New Post</h1>
+       <div></div>
+       <div>
+         <input type="file" (change)="onFileSelected($event)" #fileUpload>
+       </div>
+       <mat-form-field appearance="outline">
+         <mat-label>Description</mat-label>
+         <textarea matInput></textarea>
+       </mat-form-field>
+       <div>
+       <button (click)="uploadFile(); onPostButtonClick.emit()">Post</button>
+       </div>
+     </mat-card>

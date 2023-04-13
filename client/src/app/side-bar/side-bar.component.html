@@ -10,7 +10,7 @@
 
 <mat-sidenav-container>
   <mat-sidenav mode = "side" opened="true">
-    <app-sidenav></app-sidenav>
+    <app-sidenav (onPostButtonClick)="togglePostVisibility()" (onHomeButtonClick)="handleHomeButtonClick()"></app-sidenav>
   </mat-sidenav>
 
   <mat-sidenav-content>
@@ -18,7 +18,8 @@
     <router-outlet></router-outlet>
 
     <div class = "parent-container">
-      <app-home></app-home>
+      <app-post *ngIf="isPostVisible" (onPostButtonClick)="togglePostVisibility()"></app-post>
+      <app-home [ngStyle]="{'margin-top': isPostVisible ? '180px' : '0'}"></app-home>
     </div>
 
     <div class="sidebar-text">
@@ -27,7 +28,6 @@
     
 
     <button (click) = "logout()" class="logout-button" mat-button>Logout</button>
-    <button (click) = "visit()" class="below-logout-button" mat-button>Visit user1: testing only</button>
 
   </mat-sidenav-content>
 

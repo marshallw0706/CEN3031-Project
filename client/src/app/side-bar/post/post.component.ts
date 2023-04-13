@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Output } from '@angular/core';
 import { HttpClient, HttpHeaders } from '@angular/common/http'
 import { lastValueFrom } from 'rxjs';
 import { Router } from '@angular/router';
@@ -16,9 +16,7 @@ interface APIFile{
   styleUrls: ['./post.component.css']
 })
 export class PostComponent {
-  public audiodetected = false
-  public picturedetected = false
-
+  @Output() onPostButtonClick = new EventEmitter<void>()
   public data = ''
   public files: APIFile[] = []
   public fileName = ''
@@ -49,32 +47,4 @@ export class PostComponent {
     this.httpClient.post("/api/users/"+GlobalConstants.loggedinid+"/files/upload", formData).subscribe()
 
   }
-
-  
-  async getFiles()
-  {
-    this.audiodetected = false
-    this.picturedetected = false
-    const files$ = await this.httpClient.get<APIFile[]>("/api/users/"+GlobalConstants.loggedinid+"/files", {})
-    this.files = await lastValueFrom(files$)
-    for(var file of this.files)
-    {
-      if(file.type == "image/png")
-      {
-        console.log("image recognized")
-        this.picturedetected = true
-        this.filedisplay = file
-      }
-      if(file.type == "audio/mpeg")
-      {
-        console.log("audio recognized")
-        this.audiodetected = true
-        this.filedisplay2 = file
-      }
-      console.log(file.filename)
-    }
-    console.log("In files")
-    
-  }
-
 }

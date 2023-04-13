@@ -1,6 +1,7 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ViewChild } from '@angular/core';
 import { Router } from '@angular/router';
 import { GlobalConstants } from 'src/common/global-constants';
+import { HomeComponent } from './home/home.component';
 
 @Component({
   selector: 'app-root',
@@ -9,6 +10,7 @@ import { GlobalConstants } from 'src/common/global-constants';
 })
 export class SideBarComponent implements OnInit {
   public hellouser = GlobalConstants.loggedinuser
+  @ViewChild(HomeComponent) homeComponent: HomeComponent;
   constructor(
     private router: Router
   ){}
@@ -16,6 +18,19 @@ export class SideBarComponent implements OnInit {
     this.check()
   }
   title = 'homepage';
+
+  isPostVisible = false;
+
+  handleHomeButtonClick() {
+    if (this.isPostVisible) {
+      this.togglePostVisibility();
+    }
+    this.homeComponent.getFiles();
+  }
+
+  togglePostVisibility() {
+    this.isPostVisible = !this.isPostVisible;
+  }
 
   check()
   {
@@ -32,13 +47,5 @@ export class SideBarComponent implements OnInit {
     GlobalConstants.loggedin = false
     console.log("logout successful")
     this.check()
-  }
-
-  visit()
-  {
-    console.log("In visit with user id " + GlobalConstants.loggedinid)
-    GlobalConstants.viewprofileid = 1n
-    console.log("In visit with user id " + GlobalConstants.loggedinid)
-    this.router.navigate(['/profile'])
   }
 }
