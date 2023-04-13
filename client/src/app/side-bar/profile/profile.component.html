@@ -13,10 +13,10 @@
       <mat-card-content>
         <p>{{ profile.description }}</p>
       </mat-card-content>
-      <!-- <mat-card-actions>
-        <button mat-button>Follow</button>
-        <button mat-button>Message</button>
-      </mat-card-actions> -->
+      <mat-card-actions>
+        <button mat-button [ngStyle]="{'color': user.following ? 'red' : 'inherit'}" (click) = "togglefollow()" *ngIf= "user.ID != userID">{{ user.following ? 'Following' : 'Follow' }}</button>
+        <button mat-button *ngIf= "user.ID != userID">Message</button>
+      </mat-card-actions>
     </div>
     <div *ngIf="editMode">
       <mat-form-field>

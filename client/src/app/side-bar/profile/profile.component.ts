@@ -15,6 +15,7 @@ interface User{
   ID: BigInt
   username: string
   password: string
+  following: boolean
 }
 
 interface ProfileInfo{
@@ -32,6 +33,7 @@ export class ProfileComponent {
   public userID = GlobalConstants.loggedinid
   public handle: string
   public files: APIFile[] = []
+  public users: User[] = []
   public user: User
   public profileinfo: ProfileInfo
   public uploadfile: File
@@ -60,6 +62,23 @@ export class ProfileComponent {
     const user$ = await this.httpClient.get<User>('/api/users/'+GlobalConstants.viewprofileid, {})
     this.user = await lastValueFrom(user$)
     this.handle = this.user.username
+    const users$ = this.httpClient.get<User[]>('/api/users/'+GlobalConstants.loggedinid+'/following', {})
+    this.users = await lastValueFrom(users$)
+    if(this.users != null)
+    {
+    for(var user of this.users)
+    {
+      console.log("Looking at users")
+      if(user.ID == GlobalConstants.viewprofileid)
+      {
+        this.user.following = true
+      }
+    }
+  }
+    if(this.user.following == null)
+    {
+      this.user.following = false
+    }
   }
 
   onFileSelected(event) {
@@ -97,6 +116,25 @@ export class ProfileComponent {
     }).subscribe((response: any) => console.log("good update profileinfo => " + response + " name: " + response.name), (error) => console.log("bad update profileinfo " + error))
     }
     this.editMode = !this.editMode;
+  }
+
+  togglefollow()
+  {
+    this.user.following = !this.user.following
+    if(this.user.following)
+    {
+        this.httpClient.post('/api/users/'+GlobalConstants.loggedinid+'/follow/'+GlobalConstants.viewprofileid, {}).subscribe(
+          (response: any) => console.log("successful follow: " + response),
+      (error) => console.log("failure to follow: " + error)
+    );
+    }
+    if(!this.user.following)
+    {
+      this.httpClient.delete('/api/users/'+GlobalConstants.loggedinid+'/unfollow/'+GlobalConstants.viewprofileid, {}).subscribe(
+        (response: any) => console.log("successful unfollow: " + response),
+    (error) => console.log("failure to unfollow: " + error)
+  );
+    }
   }
 
   async getFiles()
