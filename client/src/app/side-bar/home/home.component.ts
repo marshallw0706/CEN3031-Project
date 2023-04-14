@@ -13,7 +13,7 @@ interface User{
 interface Comment{
   ID: BigInt
   content: string
-  PostedBy: User
+  postedby: User
 }
 
 interface APIFile{
@@ -38,12 +38,14 @@ interface APIFile{
 })
 export class HomeComponent implements OnInit{
   public files: APIFile[] = []
+  public comment: string
   public usersfiles: APIFile[] = []
   public currlikes: number
   public user: User
   public currlikedby: User[]
   public users: User[]
   public reversedFiles: APIFile[] = [];
+  public comments: Comment[]
   public uploadfile: File
   constructor(
     private httpClient: HttpClient,
@@ -96,6 +98,9 @@ export class HomeComponent implements OnInit{
       {
         file.liked = false
       }
+      const comments$ = this.httpClient.get<Comment[]>('/api/users/'+file.owner_id+'/files/'+file.ID+'/comments', {})
+      this.comments = await lastValueFrom(comments$)
+      file.comments = this.comments
     }
     this.reversedFiles = this.files.sort((a, b) => {
       if (a.created_at < b.created_at) {
@@ -132,6 +137,25 @@ export class HomeComponent implements OnInit{
   {
     GlobalConstants.viewprofileid = BigInt(id)
     this.router.navigate(['profile'])
+  }
+
+  async addComment(file: APIFile, commentInput: string)
+  {
+    const newUser: User = {
+      ID: BigInt(0),
+      username: GlobalConstants.loggedinuser,
+      password: null
+    };
+    const newComment: Comment = {
+      ID: BigInt(0),
+      content: commentInput,
+      postedby: newUser
+    };
+    file.comments.push(newComment)
+    this.httpClient.post('/api/users/'+GlobalConstants.loggedinid+'/comment/'+file.owner_id+'/'+file.ID, {"content": commentInput}).subscribe(
+      (response: any) => console.log("success to post comment: " + response), (error) => console.log("error in post comment: "+ error)
+    )
+
   }
 
 }
