@@ -30,6 +30,10 @@ func initializeRouter() {
 	router.HandleFunc("/api/users/{uid}/unlike/{id}/{fid}", unlikeFile).Methods("DELETE")
 	router.HandleFunc("/api/users/{id}/files/{fid}/likedby", getLikedByUsers).Methods("GET")
 
+	router.HandleFunc("/api/users/{uid}/comment/{id}/{fid}", postComment).Methods("POST")
+	router.HandleFunc("/api/users/{uid}/comment/{id}/{fid}/{cid}", deleteComment).Methods("DELETE")
+	router.HandleFunc("/api/users/{id}/files/{fid}/comments", getComments).Methods("GET")
+
 	router.HandleFunc("/api/users/{id}/files", getFiles).Methods("GET")
 	router.HandleFunc("/api/users/{id}/files", createFile).Methods("POST")
 	router.HandleFunc("/api/users/{id}/files/upload", uploadFile).Methods("POST")
@@ -60,14 +64,16 @@ type User struct {
 
 type File struct {
 	gorm.Model
-	Filename  string `json:"filename" gorm:"not null"`
-	Size      int64  `json:"size" gorm:"not null"`
-	Type      string `json:"type" gorm:"not null"`
-	OwnerID   string `json:"owner_id" gorm:"not null"`
-	CreatedAt int64  `json:"created_at" gorm:"not null"`
-	Data      []byte `json:"data" gorm:"not null"`
-	Likes     int64  `json:"likes" gorm:"not null"`
-	LikedBy   []User `json:"likedby" gorm:"many2many:file_likes"`
+	Filename    string    `json:"filename" gorm:"not null"`
+	Size        int64     `json:"size" gorm:"not null"`
+	Type        string    `json:"type" gorm:"not null"`
+	OwnerID     string    `json:"owner_id" gorm:"not null"`
+	CreatedAt   int64     `json:"created_at" gorm:"not null"`
+	Data        []byte    `json:"data" gorm:"not null"`
+	Likes       int64     `json:"likes" gorm:"not null"`
+	LikedBy     []User    `json:"likedby" gorm:"many2many:file_likes"`
+	Description string    `json:"description" gorm:"not null"`
+	Comments    []Comment `json:"comments" gorm:"foreignkey:FileID"`
 }
 
 type ProfileStruct struct {
@@ -77,12 +83,20 @@ type ProfileStruct struct {
 	Description string `json:"description"`
 }
 
+type Comment struct {
+	gorm.Model
+	Content  string `json:"content" gorm:"not null"`
+	PostedBy User   `json:"postedby" gorm:"foreignkey:UserID"`
+	UserID   uint   `json:"-"`
+	FileID   uint   `json:"-"`
+}
+
 func InitialMigration() {
 	DB, err = gorm.Open(mysql.Open(DSN), &gorm.Config{})
 	if err != nil {
 		panic("Cannot connect to DB")
 	}
-	DB.AutoMigrate(&User{}, &File{}, &ProfileStruct{})
+	DB.AutoMigrate(&User{}, &File{}, &ProfileStruct{}, &Comment{})
 }
 func GetUsers(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Content-Type", "application/json")
@@ -341,6 +355,104 @@ func getLikedByUsers(w http.ResponseWriter, r *http.Request) {
 
 	w.WriteHeader(http.StatusOK)
 	json.NewEncoder(w).Encode(likedByUsers)
+}
+
+func postComment(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	var user, owner User
+	DB.First(&user, params["uid"])
+	DB.First(&owner, params["id"])
+
+	if user.ID == 0 || owner.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "user not found"})
+		return
+	}
+
+	var file File
+	DB.Preload("Comments").Where("owner_id = ? AND id = ?", owner.ID, params["fid"]).First(&file)
+
+	if file.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	var newComment Comment
+	json.NewDecoder(r.Body).Decode(&newComment)
+	newComment.UserID = user.ID
+	newComment.FileID = file.ID
+
+	DB.Create(&newComment)
+
+	w.WriteHeader(http.StatusCreated)
+	json.NewEncoder(w).Encode(newComment)
+}
+
+func deleteComment(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	var user, owner User
+	DB.First(&user, params["uid"])
+	DB.First(&owner, params["id"])
+
+	if user.ID == 0 || owner.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "user not found"})
+		return
+	}
+
+	var file File
+	DB.Where("owner_id = ? AND id = ?", owner.ID, params["fid"]).First(&file)
+
+	if file.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	var comment Comment
+	DB.Where("user_id = ? AND file_id = ? AND id = ?", user.ID, file.ID, params["cid"]).First(&comment)
+
+	if comment.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "comment not found"})
+		return
+	}
+
+	DB.Delete(&comment)
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(map[string]string{"message": "comment deleted"})
+}
+
+func getComments(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Content-Type", "application/json")
+	params := mux.Vars(r)
+
+	var owner User
+	DB.First(&owner, params["id"])
+
+	if owner.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "user not found"})
+		return
+	}
+
+	var file File
+	DB.Preload("Comments.PostedBy").Where("owner_id = ? AND id = ?", owner.ID, params["fid"]).First(&file)
+
+	if file.ID == 0 {
+		w.WriteHeader(http.StatusNotFound)
+		json.NewEncoder(w).Encode(map[string]string{"message": "file not found"})
+		return
+	}
+
+	w.WriteHeader(http.StatusOK)
+	json.NewEncoder(w).Encode(file.Comments)
 }
 
 // handler for uploading a file to an account

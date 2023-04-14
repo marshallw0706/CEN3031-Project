@@ -10,6 +10,12 @@ interface User{
   password: string
 }
 
+interface Comment{
+  ID: BigInt
+  content: string
+  PostedBy: User
+}
+
 interface APIFile{
   ID: BigInt
 	filename: string
@@ -21,6 +27,8 @@ interface APIFile{
   liked: boolean
   handle: string
   created_at: BigInt
+  description: string
+  comments: Comment[]
 }
 
 @Component({

@@ -6,7 +6,7 @@
        </div>
        <mat-form-field appearance="outline">
          <mat-label>Description</mat-label>
-         <textarea matInput></textarea>
+         <textarea matInput [(ngModel)] = "description" [ngModelOptions]="{standalone: true}"></textarea>
        </mat-form-field>
        <div>
        <button (click)="uploadFile(); onPostButtonClick.emit()">Post</button>

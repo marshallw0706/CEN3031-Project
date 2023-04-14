@@ -18,6 +18,7 @@ interface APIFile{
 export class PostComponent {
   @Output() onPostButtonClick = new EventEmitter<void>()
   public data = ''
+  public description = ''
   public files: APIFile[] = []
   public fileName = ''
   public uploadfile: File
@@ -44,7 +45,9 @@ export class PostComponent {
   {
     const formData = new FormData()
     formData.append('file', this.uploadfile)
-    this.httpClient.post("/api/users/"+GlobalConstants.loggedinid+"/files/upload", formData).subscribe()
-
+    this.httpClient.post("/api/users/"+GlobalConstants.loggedinid+"/files/upload", formData).subscribe(
+      (response: any) => this.httpClient.put("/api/users/"+GlobalConstants.loggedinid+"/files/"+response.ID, {"description": this.description}).subscribe(),
+      (error) => console.log("error uploading file")
+    )
   }
 }

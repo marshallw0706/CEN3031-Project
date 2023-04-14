@@ -7,16 +7,19 @@
   <div *ngIf="file.type.startsWith('image') && (file.filename != 'profilepic.png' && file.filename != 'profilepic.jpeg')">
     <h3><a (click) = "gotoprofile(file.owner_id)" class="handle-link">@{{ file.handle }}</a>  posted a new image!</h3>
     <img [src]="'data:' + file.type + ';base64,' + file.data" alt="Image" width="300px">
+    <div>{{file.description}}</div>
   </div>
 
   <div *ngIf="file.type.startsWith('image') && (file.filename == 'profilepic.png')">
     <h3><a (click) = "gotoprofile(file.owner_id)" class="handle-link">@{{ file.handle }}</a> updated their profile picture!</h3>
     <img [src]="'data:' + file.type + ';base64,' + file.data" alt="Image" width="300px">
+    <div>{{file.description}}</div>
   </div>
 
   <div *ngIf="file.type.startsWith('audio')">
     <h3><a (click) = "gotoprofile(file.owner_id)" class="handle-link">@{{ file.handle }}</a>  posted a new track!</h3>
     <audio controls [src]="'data:' + file.type + ';base64,' + file.data"></audio>
+    <div>{{file.description}}</div>
   </div>
 
   <mat-card-actions>
