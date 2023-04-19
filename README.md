@@ -16,7 +16,7 @@ Make sure MySQL server has been downloaded on your computer. https://dev.mysql.c
 Start a new server on host:localhost with username root and no password
 <br><br>
 <img src="/gifs/mysqlworkbench.gif" width="600" height="300"/>
-## Step 2
+## Step 3
 Run api by building the project (using go build) and running the executable. Run client by running "npm run start".
 <br><br>
 <img src="/gifs/runproject (1).gif" width="600" height="300"/>
