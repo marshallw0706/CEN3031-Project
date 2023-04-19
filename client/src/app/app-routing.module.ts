@@ -9,6 +9,7 @@ import { PostComponent } from './side-bar/post/post.component';
 import { ExploreComponent } from './side-bar/explore/explore.component';
 import { ProfileComponent } from './side-bar/profile/profile.component';
 import { SearchingComponent } from './side-bar/searching/searching.component';
+import { ContactComponent } from './side-bar/contact/contact.component';
 
 const routes: Routes = [
   {
@@ -42,6 +43,10 @@ const routes: Routes = [
   {
     path:'searching', 
     component:SearchingComponent
+  },
+  {
+    path:'contact',
+    component:ContactComponent
   }
 ];
 

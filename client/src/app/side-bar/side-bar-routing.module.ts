@@ -7,6 +7,7 @@ import { ProfileComponent } from './profile/profile.component';
 import { CommunityComponent } from '../community/community.component';
 import { SearchComponent } from './search/search.component';
 import { SearchingComponent } from './searching/searching.component';
+import { ContactComponent } from './contact/contact.component';
 
 const routes: Routes = [
   {path: '', redirectTo:'home', pathMatch: 'full'},
@@ -14,7 +15,8 @@ const routes: Routes = [
   {path:'profile', component:ProfileComponent},
   {path:'post', component:PostComponent},
   {path:'explore', component:ExploreComponent},
-  {path: 'searching', component:SearchingComponent}
+  {path: 'searching', component:SearchingComponent},
+  {path: 'contact', component:ContactComponent}
 ];
 
 @NgModule({
