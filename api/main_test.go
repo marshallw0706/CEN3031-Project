@@ -811,3 +811,74 @@ func TestUnlikeFile(t *testing.T) {
 	DB.Delete(&file)
 	DB.Delete(&user)
 }
+
+func TestRemoveFollower(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{id}/unfollow/{fid}", removeFollower).Methods("DELETE")
+
+	user := &User{Username: "testuser", Password: "testpass"}
+	follower := &User{Username: "testfollower", Password: "testpass"}
+	DB.Create(&user)
+	DB.Create(&follower)
+
+	// Make the user follow the follower before testing
+	DB.Model(&user).Association("Following").Append(&follower)
+
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("/api/users/%d/unfollow/%d", user.ID, follower.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var returnedUser User
+	json.Unmarshal(rr.Body.Bytes(), &returnedUser)
+	if len(returnedUser.Following) != 0 {
+		t.Errorf("handler returned wrong number of followers: got %v want %v",
+			len(returnedUser.Following), 0)
+	}
+
+	DB.Delete(&follower)
+	DB.Delete(&user)
+}
+
+func TestAddFollower(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{id}/follow/{fid}", addFollower).Methods("POST")
+
+	user := &User{Username: "testuser", Password: "testpass"}
+	follower := &User{Username: "testfollower", Password: "testpass"}
+	DB.Create(&user)
+	DB.Create(&follower)
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("/api/users/%d/follow/%d", user.ID, follower.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var returnedUser User
+	json.Unmarshal(rr.Body.Bytes(), &returnedUser)
+	if len(returnedUser.Following) != 1 {
+		t.Errorf("handler returned wrong number of followers: got %v want %v",
+			len(returnedUser.Following), 1)
+	}
+
+	// Clean up following relationship
+	DB.Model(&user).Association("Following").Delete(&follower)
+	DB.Delete(&follower)
+	DB.Delete(&user)
+}
