@@ -35,6 +35,7 @@ import { SideBarComponent } from './side-bar/side-bar.component';
 import { SearchComponent } from './side-bar/search/search.component';
 import { CommunityComponent } from './community/community.component';
 import { SearchingComponent } from './side-bar/searching/searching.component';
+import { ContactComponent } from './side-bar/contact/contact.component';
 
 @NgModule({
   declarations: [
@@ -50,7 +51,8 @@ import { SearchingComponent } from './side-bar/searching/searching.component';
     ExploreComponent,
     SideBarComponent,
     SearchComponent,
-    CommunityComponent
+    CommunityComponent,
+    ContactComponent
 
   ],
   imports: [
