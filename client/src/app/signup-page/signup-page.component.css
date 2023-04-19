@@ -3,4 +3,9 @@
 }
 .login-form{
     padding: 20px;
+    background-color: #e5e8fa;
+}
+
+body{
+    background-color: #d7dcf7;
 }
