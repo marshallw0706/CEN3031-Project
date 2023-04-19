@@ -1,4 +1,5 @@
 import { ComponentFixture, TestBed } from '@angular/core/testing';
+import { CUSTOM_ELEMENTS_SCHEMA } from '@angular/core';
 
 import { ExploreComponent } from './explore.component';
 
@@ -9,7 +10,10 @@ describe('ExploreComponent', () => {
 
   beforeEach(async () => {
     await TestBed.configureTestingModule({
-      declarations: [ ExploreComponent ]
+      declarations: [ ExploreComponent ],
+      schemas:[
+        CUSTOM_ELEMENTS_SCHEMA
+      ]
     })
     .compileComponents();
 
@@ -27,4 +31,6 @@ describe('ExploreComponent', () => {
     expect(data.querySelector(".content").textContent).toContain("This explore page holds posts/music from other artists that they do not follow")
   })
 });
+
+
 

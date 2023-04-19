@@ -25,6 +25,9 @@ interface APIFile{
   likes: number
   likedby: User[]
   liked: boolean
+  dislikes: number
+  disby: User[]
+  disliked: boolean
   handle: string
   created_at: BigInt
   description: string
@@ -131,7 +134,12 @@ export class HomeComponent implements OnInit{
       (error) => console.log("failure to unlike: " + error)
     );
   }
+  
 }
+
+
+
+
 
   gotoprofile(id: string)
   {
