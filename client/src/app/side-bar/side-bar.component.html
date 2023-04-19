@@ -10,30 +10,32 @@
 </mat-toolbar-row>
 
 
-<mat-sidenav-container>
-  <mat-sidenav mode = "side" opened="true">
-    <app-sidenav (onPostButtonClick)="togglePostVisibility()" (onHomeButtonClick)="handleHomeButtonClick()"></app-sidenav>
-  </mat-sidenav>
-
-  <mat-sidenav-content>
-    <app-header></app-header>
-    <router-outlet></router-outlet>
-
-    <div class = "parent-container">
-      <app-post *ngIf="isPostVisible" (onPostButtonClick)="togglePostVisibility()"></app-post>
-      <app-home [ngStyle]="{'margin-top': isPostVisible ? '180px' : '0'}"></app-home>
-    </div>
-
-    <div class="sidebar-text">
-      Welcome back, {{hellouser}}!
-    </div>
-    
-
-    <button (click) = "logout()" class="logout-button" mat-button>Logout</button>
-
-  </mat-sidenav-content>
-
-</mat-sidenav-container> 
+<body>
+  <mat-sidenav-container>
+    <mat-sidenav mode = "side" opened="true">
+      <app-sidenav (onPostButtonClick)="togglePostVisibility()" (onHomeButtonClick)="handleHomeButtonClick()"></app-sidenav>
+    </mat-sidenav>
+  
+    <mat-sidenav-content>
+      <app-header></app-header>
+      <router-outlet></router-outlet>
+  
+      <div class = "parent-container">
+        <app-post *ngIf="isPostVisible" (onPostButtonClick)="togglePostVisibility()"></app-post>
+        <app-home [ngStyle]="{'margin-top': isPostVisible ? '180px' : '0'}"></app-home>
+      </div>
+  
+      <div class="sidebar-text">
+        Welcome back, {{hellouser}}!
+      </div>
+      
+  
+      <button (click) = "logout()" class="logout-button" mat-button>Logout</button>
+  
+    </mat-sidenav-content>
+  
+  </mat-sidenav-container> 
+</body>
 
 
 
