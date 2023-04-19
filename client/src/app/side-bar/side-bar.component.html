@@ -31,6 +31,14 @@
 
     <button (click) = "logout()" class="logout-button" mat-button>Logout</button>
 
+    <div class="profile-search">
+      <input [(ngModel)] = "usernametoprofile" [ngModelOptions]="{standalone: true}" placeholder="Search profile" class="profile-search-input">
+    </div>
+
+    <div class="profile-search-button">
+      <button (click)="gotoprofile()">Search</button>
+    </div>
+
   </mat-sidenav-content>
 
 </mat-sidenav-container> 

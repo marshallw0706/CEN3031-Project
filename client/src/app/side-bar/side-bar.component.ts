@@ -18,6 +18,7 @@ interface User{
 })
 export class SideBarComponent implements OnInit {
   public hellouser = GlobalConstants.loggedinuser
+  public usernametoprofile
   @ViewChild(HomeComponent) homeComponent: HomeComponent;
   constructor(
     private router: Router,
@@ -97,6 +98,20 @@ export class SideBarComponent implements OnInit {
       this.togglePostVisibility();
     }
     this.homeComponent.getFiles();
+  }
+
+  async gotoprofile()
+  {
+    const users$ = await this.httpClient.get<User[]>('/api/users', {})
+    const users = await lastValueFrom(users$)
+    for(var user of users)
+    {
+      if(user.username == this.usernametoprofile)
+      {
+        GlobalConstants.viewprofileid = user.ID
+        this.router.navigate(['profile'])
+      }
+    }
   }
 
   togglePostVisibility() {
