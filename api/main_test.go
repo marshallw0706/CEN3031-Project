@@ -575,15 +575,13 @@ func TestDeleteComment(t *testing.T) {
 	DB.Delete(&user)
 }
 
-// Not working yet.
 func TestPostComment(t *testing.T) {
 	InitialMigration()
 	router := mux.NewRouter()
 	router.HandleFunc("/api/users/{uid}/comment/{id}/{fid}", postComment).Methods("POST")
 
-	// Create test data
 	user := &User{Username: "testuser", Password: "testpass"}
-	DB.Create(user)
+	DB.Create(&user)
 
 	file := &File{
 		Filename:    "testfile",
@@ -591,32 +589,19 @@ func TestPostComment(t *testing.T) {
 		Type:        "text/plain",
 		OwnerID:     strconv.Itoa(int(user.ID)),
 		CreatedAt:   time.Now().Unix(),
-		Data:        []byte("Test data"),
+		Data:        []byte("test data"),
 		Likes:       0,
-		Description: "Test description",
+		Description: "Test file",
 	}
-	DB.Create(file)
+	DB.Create(&file)
 
-	type CommentResponse struct {
-		gorm.Model
-		Content  string `json:"content" gorm:"not null"`
-		PostedBy User   `json:"postedby" gorm:"foreignkey:UserID"`
-		UserID   uint   `json:"user_id"`
-		FileID   uint   `json:"file_id"`
-	}
-
-	// Test data for the new comment
-	newComment := Comment{Content: "Test comment"}
-
-	jsonComment, err := json.Marshal(newComment)
+	commentData := `{"content": "test comment"}`
+	req, err := http.NewRequest("POST", fmt.Sprintf("/api/users/%d/comment/%d/%d", user.ID, user.ID, file.ID), strings.NewReader(commentData))
 	if err != nil {
 		t.Fatal(err)
 	}
+	req.Header.Set("Content-Type", "application/json")
 
-	req, err := http.NewRequest("POST", fmt.Sprintf("/api/users/%d/comment/%d/%d", user.ID, user.ID, file.ID), bytes.NewBuffer(jsonComment))
-	if err != nil {
-		t.Fatal(err)
-	}
 	rr := httptest.NewRecorder()
 	router.ServeHTTP(rr, req)
 
@@ -625,24 +610,14 @@ func TestPostComment(t *testing.T) {
 			rr.Code, http.StatusCreated)
 	}
 
-	var postedComment CommentResponse
-	err = json.Unmarshal(rr.Body.Bytes(), &postedComment)
-	if err != nil {
-		t.Fatal(err)
+	var returnedComment Comment
+	json.Unmarshal(rr.Body.Bytes(), &returnedComment)
+	if returnedComment.Content != "test comment" {
+		t.Errorf("handler returned wrong comment content: got %v want %v",
+			returnedComment.Content, "test comment")
 	}
 
-	if postedComment.Content != newComment.Content {
-		t.Errorf("handler returned unexpected content: got %v want %v",
-			postedComment.Content, newComment.Content)
-	}
-
-	if postedComment.UserID != user.ID || postedComment.FileID != file.ID {
-		t.Errorf("handler did not assign correct user or file ID: got UserID %v FileID %v, want UserID %v FileID %v",
-			postedComment.UserID, postedComment.FileID, user.ID, file.ID)
-	}
-
-	// Clean up test data
-	DB.Delete(&postedComment)
+	DB.Delete(&returnedComment)
 	DB.Delete(&file)
 	DB.Delete(&user)
 }
@@ -745,5 +720,94 @@ func TestGetFollowingUsers(t *testing.T) {
 	user.Following = []User{}
 	DB.Save(user)
 	DB.Delete(&followed)
+	DB.Delete(&user)
+}
+
+func TestLikeFile(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{uid}/like/{id}/{fid}", likeFile).Methods("POST")
+
+	user := &User{Username: "testuser", Password: "testpass"}
+	DB.Create(&user)
+
+	file := &File{
+		Filename:    "testfile",
+		Size:        1024,
+		Type:        "text/plain",
+		OwnerID:     strconv.Itoa(int(user.ID)),
+		CreatedAt:   time.Now().Unix(),
+		Data:        []byte("test data"),
+		Likes:       0,
+		Description: "Test file",
+	}
+	DB.Create(&file)
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("/api/users/%d/like/%d/%d", user.ID, user.ID, file.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var returnedFile File
+	json.Unmarshal(rr.Body.Bytes(), &returnedFile)
+	if returnedFile.Likes != 1 {
+		t.Errorf("handler returned wrong number of likes: got %v want %v",
+			returnedFile.Likes, 1)
+	}
+
+	DB.Delete(&file)
+	DB.Delete(&user)
+}
+
+func TestUnlikeFile(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{uid}/unlike/{id}/{fid}", unlikeFile).Methods("DELETE")
+
+	user := &User{Username: "testuser", Password: "testpass"}
+	DB.Create(&user)
+
+	file := &File{
+		Filename:    "testfile",
+		Size:        1024,
+		Type:        "text/plain",
+		OwnerID:     strconv.Itoa(int(user.ID)),
+		CreatedAt:   time.Now().Unix(),
+		Data:        []byte("test data"),
+		Likes:       1,
+		Description: "Test file",
+	}
+	DB.Create(&file)
+
+	// Add user as a liker of the file
+	DB.Model(&file).Association("LikedBy").Append(user)
+
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("/api/users/%d/unlike/%d/%d", user.ID, user.ID, file.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var returnedFile File
+	json.Unmarshal(rr.Body.Bytes(), &returnedFile)
+	if returnedFile.Likes != 0 {
+		t.Errorf("handler returned wrong number of likes: got %v want %v",
+			returnedFile.Likes, 0)
+	}
+
+	DB.Delete(&file)
 	DB.Delete(&user)
 }
