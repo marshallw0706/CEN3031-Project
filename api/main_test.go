@@ -118,6 +118,37 @@ func TestGetUsers(t *testing.T) {
 	DB.Where("username = ?", "testuser2").Delete(&user2)
 }
 
+func TestGetUser(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{id}", GetUser).Methods("GET")
+
+	user1 := &User{Username: "testuser1", Password: "testpass1"}
+	DB.Create(&user1)
+	var idUser User
+	DB.Where("username = ?", "testuser1").First(&idUser)
+	id := idUser.ID
+
+	req, err := http.NewRequest("GET", "/api/users/"+strconv.Itoa(int(id)), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v", rr.Code, http.StatusOK)
+	}
+
+	var user User
+	json.Unmarshal(rr.Body.Bytes(), &user)
+	if user.Username != "testuser1" {
+		t.Errorf("handler returned wrong username: got %v want %v", user.Username, "testuser1")
+	}
+
+	DB.Where("username = ?", "testuser1").Delete(&user1)
+}
+
 func TestUploadFile(t *testing.T) {
 	// Initialize the database for testing
 	InitialMigration()
@@ -420,5 +451,63 @@ func TestDeleteFile(t *testing.T) {
 	}
 
 	// Clean up by deleting the test user from the database
+	DB.Delete(&user)
+}
+
+func TestGetComments(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{id}/files/{fid}/comments", getComments).Methods("GET")
+
+	// Create test data
+	user := &User{Username: "testuser", Password: "testpass"}
+	DB.Create(user)
+
+	file := &File{
+		Filename:    "testfile",
+		Size:        1024,
+		Type:        "text/plain",
+		OwnerID:     strconv.Itoa(int(user.ID)),
+		CreatedAt:   time.Now().Unix(),
+		Data:        []byte("Test data"),
+		Likes:       0,
+		Description: "Test description",
+	}
+	DB.Create(file)
+
+	comment := &Comment{
+		Content: "Test comment",
+		UserID:  user.ID,
+		FileID:  file.ID,
+	}
+	DB.Create(comment)
+
+	// Test the endpoint
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/users/%d/files/%d/comments", user.ID, file.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var comments []Comment
+	err = json.Unmarshal(rr.Body.Bytes(), &comments)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(comments) != 1 || comments[0].Content != comment.Content {
+		t.Errorf("handler returned unexpected comments: got %v want %v",
+			comments, []Comment{*comment})
+	}
+
+	// Clean up test data
+	DB.Delete(&comment)
+	DB.Delete(&file)
 	DB.Delete(&user)
 }
