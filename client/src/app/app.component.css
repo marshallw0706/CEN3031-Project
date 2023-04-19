@@ -8,7 +8,9 @@ mat-toolbar-row{
     background-color: dodgerblue;
     color: white;
     font-size: x-large;
-    font-family: sans-serif ;
+    font-family: 'my-font';
+    
+    
 }
 mat-sidenav {
     margin: 16px;

@@ -40,7 +40,7 @@ func initializeRouter() {
 	router.HandleFunc("/api/users/{id}/files/{fid}", updateFile).Methods("PUT")
 	router.HandleFunc("/api/users/{id}/files/{fid}", deleteFile).Methods("DELETE")
 
-	log.Fatal(http.ListenAndServe(":5000", router))
+	log.Fatal(http.ListenAndServe(":9000", router))
 }
 
 func main() {
@@ -51,7 +51,7 @@ func main() {
 var DB *gorm.DB
 var err error
 
-const DSN = "root:@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
+const DSN = "root:Sofia0106!@tcp(localhost:3306)/sys?charset=utf8&parseTime=true"
 
 type User struct {
 	gorm.Model

@@ -8,8 +8,11 @@ mat-toolbar-row{
     background-color: dodgerblue;
     color: white;
     font-size: x-large;
-    font-family: sans-serif ;
-}
+    font-family:'myfont' ;
+    
+  
+  
+  }
 mat-sidenav {
     margin: 16px;
     width: 240px;
@@ -83,6 +86,11 @@ mat-sidenav-container{
     width: 97%;
     padding: 16px;
   }
+
+  .mat-icon{
+    vertical-align:middle;
+    color: white;
+}
 
 
 

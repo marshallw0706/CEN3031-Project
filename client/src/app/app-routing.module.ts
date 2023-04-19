@@ -8,6 +8,7 @@ import { SideBarComponent } from './side-bar/side-bar.component';
 import { PostComponent } from './side-bar/post/post.component';
 import { ExploreComponent } from './side-bar/explore/explore.component';
 import { ProfileComponent } from './side-bar/profile/profile.component';
+import { SearchingComponent } from './side-bar/searching/searching.component';
 
 const routes: Routes = [
   {
@@ -37,6 +38,10 @@ const routes: Routes = [
   {
     path:'home', 
     component:HomeComponent
+  },
+  {
+    path:'searching', 
+    component:SearchingComponent
   }
 ];
 

@@ -19,13 +19,22 @@
     <a mat-list-item  class="homeSide" (click)="onHomeButtonClick.emit()" routerLinkActive="list-item-active"><mat-icon>home</mat-icon> Home</a>
    
     <a mat-list-item (click) = "setRoute()" routerLink="/profile" routerLinkActive="list-item-active">
-        <mat-icon>dashboard</mat-icon> Profile
+        <mat-icon>face</mat-icon> Profile
     </a>
 
-    <a mat-list-item class="exploreSide" routerLink="/explore" routerLinkActive="list-item-active"> <mat-icon>explore</mat-icon> Explore Music </a>
+    <a mat-list-item class="exploreSide" routerLink="/explore" routerLinkActive="list-item-active"> <mat-icon>search</mat-icon> Explore Music </a>
 
     <a mat-list-item class="postSide" (click)="onPostButtonClick.emit()" routerLinkActive="list-item-active"><mat-icon>microphone</mat-icon> Post </a>
 
+
+    
+    <!-- Searching is the componenet name for Community had a bit of errors sorry about that -->
+    <a mat-list-item class="searchingSide" routerLink="/searching" routerLinkActive="list-item-active"><mat-icon>people</mat-icon>Community</a>
+
+    
+
+
+    
 </mat-nav-list>
 
 

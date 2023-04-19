@@ -33,6 +33,8 @@ import { PostComponent } from './side-bar/post/post.component';
 import { ExploreComponent } from './side-bar/explore/explore.component';
 import { SideBarComponent } from './side-bar/side-bar.component';
 import { SearchComponent } from './side-bar/search/search.component';
+import { CommunityComponent } from './community/community.component';
+import { SearchingComponent } from './side-bar/searching/searching.component';
 
 @NgModule({
   declarations: [
@@ -47,7 +49,8 @@ import { SearchComponent } from './side-bar/search/search.component';
     PostComponent,
     ExploreComponent,
     SideBarComponent,
-    SearchComponent
+    SearchComponent,
+    CommunityComponent
 
   ],
   imports: [
