@@ -31,4 +31,13 @@ export class GlobalConstants {
         localStorage.setItem('viewprofileid', value.toString());
       }
 
+      static get idArray(): number[] {
+        const storedIntArray = localStorage.getItem('idArray');
+        return storedIntArray ? JSON.parse(storedIntArray) : [];
+      }
+      
+      static set idArray(value: number[]) {
+        localStorage.setItem('idArray', JSON.stringify(value));
+      }
+
 }
