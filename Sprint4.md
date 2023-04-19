@@ -50,14 +50,14 @@
  **getComments()**: Takes in a ResponseWrite and HTTP request and calls DB.Preload("Comments.PostedBy").Where("owner_id = ? AND id = ?", owner.ID, params["fid"]).First(&file) to preload the user who posted the comment(s), and retrieve said comment(s). Associated with the ("/api/users/{id}/files/{fid}/comments", getComments).Methods("GET") handle in initializeRouter. <br><br>
  
  ## Follower Functions
-  **addFollower()**: <br><br>
- **removeFollower()**:<br><br>
- **getFollowingUsers()**:  <br><br>
+  **addFollower()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/followers/{fid}", addFollower).Methods("POST") handle in initializeRouter. <br><br>
+ **removeFollower()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/followers/{fid}", removeFollower).Methods("DELETE") handle in initializeRouter. <br><br>
+ **getFollowingUsers()**:  This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/following", getFollowingUsers).Methods("GET") handle in initializeRouter. <br><br>
  
  ## Like Functions
-  **likeFile()**: <br><br>
- **unlikeFile()**: <br><br>
- **getLikedByUsers()**:  <br><br>
+  **likeFile()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/like", likeFile).Methods("POST") handle in initializeRouter. <br><br>
+ **unlikeFile()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/unlike", unlikeFile).Methods("POST") handle in initializeRouter. <br><br>
+ **getLikedByUsers()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/unlike", unlikeFile).Methods("POST") handle in initializeRouter. <br><br>
  
  ## Profile Info Functions
  
