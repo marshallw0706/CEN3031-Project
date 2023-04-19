@@ -511,3 +511,239 @@ func TestGetComments(t *testing.T) {
 	DB.Delete(&file)
 	DB.Delete(&user)
 }
+
+func TestDeleteComment(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{uid}/comment/{id}/{fid}/{cid}", deleteComment).Methods("DELETE")
+
+	// Create test data
+	user := &User{Username: "testuser", Password: "testpass"}
+	DB.Create(user)
+
+	file := &File{
+		Filename:    "testfile",
+		Size:        1024,
+		Type:        "text/plain",
+		OwnerID:     strconv.Itoa(int(user.ID)),
+		CreatedAt:   time.Now().Unix(),
+		Data:        []byte("Test data"),
+		Likes:       0,
+		Description: "Test description",
+	}
+	DB.Create(file)
+
+	comment := &Comment{
+		Content: "Test comment",
+		UserID:  user.ID,
+		FileID:  file.ID,
+	}
+	DB.Create(comment)
+
+	// Test the endpoint
+	req, err := http.NewRequest("DELETE", fmt.Sprintf("/api/users/%d/comment/%d/%d/%d", user.ID, user.ID, file.ID, comment.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var response map[string]string
+	err = json.Unmarshal(rr.Body.Bytes(), &response)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if response["message"] != "comment deleted" {
+		t.Errorf("handler returned unexpected message: got %v want %v",
+			response["message"], "comment deleted")
+	}
+
+	// Check if the comment was actually deleted
+	var deletedComment Comment
+	if err := DB.First(&deletedComment, comment.ID).Error; !errors.Is(err, gorm.ErrRecordNotFound) {
+		t.Errorf("handler did not delete comment as expected")
+	}
+
+	// Clean up test data
+	DB.Delete(&file)
+	DB.Delete(&user)
+}
+
+// Not working yet.
+func TestPostComment(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{uid}/comment/{id}/{fid}", postComment).Methods("POST")
+
+	// Create test data
+	user := &User{Username: "testuser", Password: "testpass"}
+	DB.Create(user)
+
+	file := &File{
+		Filename:    "testfile",
+		Size:        1024,
+		Type:        "text/plain",
+		OwnerID:     strconv.Itoa(int(user.ID)),
+		CreatedAt:   time.Now().Unix(),
+		Data:        []byte("Test data"),
+		Likes:       0,
+		Description: "Test description",
+	}
+	DB.Create(file)
+
+	type CommentResponse struct {
+		gorm.Model
+		Content  string `json:"content" gorm:"not null"`
+		PostedBy User   `json:"postedby" gorm:"foreignkey:UserID"`
+		UserID   uint   `json:"user_id"`
+		FileID   uint   `json:"file_id"`
+	}
+
+	// Test data for the new comment
+	newComment := Comment{Content: "Test comment"}
+
+	jsonComment, err := json.Marshal(newComment)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	req, err := http.NewRequest("POST", fmt.Sprintf("/api/users/%d/comment/%d/%d", user.ID, user.ID, file.ID), bytes.NewBuffer(jsonComment))
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusCreated {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusCreated)
+	}
+
+	var postedComment CommentResponse
+	err = json.Unmarshal(rr.Body.Bytes(), &postedComment)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if postedComment.Content != newComment.Content {
+		t.Errorf("handler returned unexpected content: got %v want %v",
+			postedComment.Content, newComment.Content)
+	}
+
+	if postedComment.UserID != user.ID || postedComment.FileID != file.ID {
+		t.Errorf("handler did not assign correct user or file ID: got UserID %v FileID %v, want UserID %v FileID %v",
+			postedComment.UserID, postedComment.FileID, user.ID, file.ID)
+	}
+
+	// Clean up test data
+	DB.Delete(&postedComment)
+	DB.Delete(&file)
+	DB.Delete(&user)
+}
+
+func TestGetLikedByUsers(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{id}/files/{fid}/likedby", getLikedByUsers).Methods("GET")
+
+	// Create test data
+	user := &User{Username: "testuser", Password: "testpass"}
+	DB.Create(user)
+
+	liker := &User{Username: "liker", Password: "testpass"}
+	DB.Create(liker)
+
+	file := &File{
+		Filename:    "testfile",
+		Size:        1024,
+		Type:        "text/plain",
+		OwnerID:     strconv.Itoa(int(user.ID)),
+		CreatedAt:   time.Now().Unix(),
+		Data:        []byte("Test data"),
+		Likes:       1,
+		Description: "Test description",
+		LikedBy:     []User{*liker},
+	}
+	DB.Create(file)
+
+	// Test the endpoint
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/users/%d/files/%d/likedby", user.ID, file.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var likedByUsers []User
+	err = json.Unmarshal(rr.Body.Bytes(), &likedByUsers)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(likedByUsers) != 1 || likedByUsers[0].Username != liker.Username {
+		t.Errorf("handler returned unexpected liked by users: got %v want %v",
+			likedByUsers, []User{*liker})
+	}
+
+	// Clean up test data
+	DB.Delete(&file)
+	DB.Delete(&liker)
+	DB.Delete(&user)
+}
+
+func TestGetFollowingUsers(t *testing.T) {
+	InitialMigration()
+	router := mux.NewRouter()
+	router.HandleFunc("/api/users/{id}/following", getFollowingUsers).Methods("GET")
+
+	// Create test data
+	user := &User{Username: "testuser", Password: "testpass"}
+	DB.Create(user)
+
+	followed := &User{Username: "followeduser", Password: "testpass"}
+	DB.Create(followed)
+
+	user.Following = append(user.Following, *followed)
+	DB.Save(user)
+
+	// Test the endpoint
+	req, err := http.NewRequest("GET", fmt.Sprintf("/api/users/%d/following", user.ID), nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+	rr := httptest.NewRecorder()
+	router.ServeHTTP(rr, req)
+
+	if rr.Code != http.StatusOK {
+		t.Errorf("handler returned wrong status code: got %v want %v",
+			rr.Code, http.StatusOK)
+	}
+
+	var followingUsers []User
+	err = json.Unmarshal(rr.Body.Bytes(), &followingUsers)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if len(followingUsers) != 1 || followingUsers[0].Username != followed.Username {
+		t.Errorf("handler returned unexpected following users: got %v want %v",
+			followingUsers, []User{*followed})
+	}
+
+	// Clean up test data
+	user.Following = []User{}
+	DB.Save(user)
+	DB.Delete(&followed)
+	DB.Delete(&user)
+}
