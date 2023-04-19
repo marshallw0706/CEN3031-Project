@@ -150,12 +150,12 @@ export class HomeComponent implements OnInit{
   async addComment(file: APIFile, commentInput: string)
   {
     const newUser: User = {
-      ID: BigInt(0),
+      ID: GlobalConstants.loggedinid,
       username: GlobalConstants.loggedinuser,
       password: null
     };
     const newComment: Comment = {
-      ID: BigInt(0),
+      ID: GlobalConstants.loggedinid,
       content: commentInput,
       postedby: newUser
     };

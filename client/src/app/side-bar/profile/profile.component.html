@@ -1,4 +1,16 @@
-
+<mat-toolbar *ngIf= "user.ID == userID">
+  <mat-icon>
+      face
+  </mat-icon>
+   &nbsp;  Welcome To Your Profile Page 
+</mat-toolbar>
+<mat-toolbar *ngIf= "user.ID != userID">
+  <mat-icon>
+      face
+  </mat-icon>
+   &nbsp;  Welcome To {{profile.name}}'s Profile Page 
+</mat-toolbar>
+&nbsp; 
 <mat-card>
     <mat-card-header>
       <mat-card-title>{{ profile.name }}</mat-card-title>

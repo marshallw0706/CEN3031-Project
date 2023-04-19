@@ -1,0 +1,25 @@
+.example-card {
+    max-width: 400px;
+    margin-bottom: 8px;
+
+  }
+
+  mat-toolbar{
+    color: white;
+    background-color: dodgerblue;
+  }
+  
+
+  mat-card {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: block;
+    box-shadow: 0 4px 8px 0 rgba(0, 0, 0, 0.2), 0 6px 20px 0 rgba(0, 0, 0, 0.19);
+    border-radius: 5px;
+    padding: 20px;
+    font-size: x-large;
+    font-family: 'myfont';
+
+
+
+  }
