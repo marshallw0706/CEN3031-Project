@@ -4,20 +4,22 @@
     height: 100%;
 }
 
+body{
+    background-color: #d7dcf7;
+}
+
 mat-toolbar-row{
-    background-color: dodgerblue;
+    background-color: #3f51b5;
     color: white;
     font-size: x-large;
     font-family:'myfont' ;
-    
-  
-  
   }
+  
 mat-sidenav {
     margin: 16px;
     width: 240px;
     border-right: none;
-    background: dodgerblue;
+    background: #3f51b5;
     color: white;
     border-radius: 20px;
     padding: 16px;
@@ -107,6 +109,7 @@ mat-sidenav-container{
     vertical-align:middle;
     color: white;
 }
+
 
 
 
