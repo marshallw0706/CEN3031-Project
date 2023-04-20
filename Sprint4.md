@@ -1240,18 +1240,18 @@ describe('SearchingComponent', () => {
  **getComments()**: Takes in a ResponseWrite and HTTP request and calls DB.Preload("Comments.PostedBy").Where("owner_id = ? AND id = ?", owner.ID, params["fid"]).First(&file) to preload the user who posted the comment(s), and retrieve said comment(s). Associated with the ("/api/users/{id}/files/{fid}/comments", getComments).Methods("GET") handle in initializeRouter. <br><br>
  
  ## Follower Functions
-  **addFollower()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/followers/{fid}", addFollower).Methods("POST") handle in initializeRouter. <br><br>
- **removeFollower()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/followers/{fid}", removeFollower).Methods("DELETE") handle in initializeRouter. <br><br>
- **getFollowingUsers()**:  This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/following", getFollowingUsers).Methods("GET") handle in initializeRouter. <br><br>
+  **addFollower()**: This function takes in a ResponseWriter and an HTTP request as input parameters and calls DB.Model(&user).Association("Following").Append(&follower) to add a follower to a user. It is associated with the ("/api/users/{id}/followers/{fid}", addFollower).Methods("POST") handle in initializeRouter. <br><br>
+ **removeFollower()**: This function takes in a ResponseWriter and an HTTP request as input parameters and calls DB.Model(&user).Association("Following").Delete(&follower) to delete a follower from a user. It is associated with the ("/api/users/{id}/followers/{fid}", removeFollower).Methods("DELETE") handle in initializeRouter. <br><br>
+ **getFollowingUsers()**:  This function takes in a ResponseWriter and an HTTP request as input parameters and calls DB.Preload("Following").First(&user, params["id"]) to get following users. It is associated with the ("/api/users/{id}/following", getFollowingUsers).Methods("GET") handle in initializeRouter. <br><br>
  
  ## Like Functions
-  **likeFile()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/like", likeFile).Methods("POST") handle in initializeRouter. <br><br>
- **unlikeFile()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/unlike", unlikeFile).Methods("POST") handle in initializeRouter. <br><br>
+  **likeFile()**: This function takes in a ResponseWriter and an HTTP request as input parameters and calls DB.Model(&file).Association("LikedBy").Append(&user) to add a user to the liked-by array of a file. It also increments the file's like count. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/like", likeFile).Methods("POST") handle in initializeRouter. <br><br>
+ **unlikeFile()**: This function takes in a ResponseWriter and an HTTP request as input parameters and calls DB.Model(&file).Association("LikedBy").Delete(&user) to delete a user from the liked-by array of a file. It also decrements the file's like count. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/unlike", unlikeFile).Methods("POST") handle in initializeRouter. <br><br>
  **getLikedByUsers()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/unlike", unlikeFile).Methods("POST") handle in initializeRouter. <br><br>
  
  ## Profile Info Functions
-   **updateProfileInfo()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/profile", UpdateProfileInfo) handle in initializeRouter. <br><br>
- **getProfileInfo()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/profile", GetProfileInfo).Methods("GET") handle in initializeRouter. <br><br>
+   **updateProfileInfo()**: This function takes in a ResponseWriter and an HTTP request as input parameters and calls DB.Model(&profile).Where("owner_id = ?", profile.OwnerID).Updates(profile) to update a user's profile info. It is associated with the ("/api/users/{id}/profile", UpdateProfileInfo) handle in initializeRouter. <br><br>
+ **getProfileInfo()**: This function takes in a ResponseWriter and an HTTP request as input parameters and calls DB.Where("owner_id = ?", params["id"]).First(&profile) to retrieve a user's profile info . It is associated with the ("/api/users/{id}/profile", GetProfileInfo).Methods("GET") handle in initializeRouter. <br><br>
  
  ## File Functions
  
