@@ -10,7 +10,7 @@ describe('check sign up page', () => {
   })
 })
 
-describe('check sidebar', () => {
+describe('check homepage', () => {
   it('passes', () => {
     cy.visit('http://localhost:4200/sidebar')
   })
@@ -25,5 +25,11 @@ describe('check profile', () => {
 describe('check post', () => {
   it('passes', () => {
     cy.visit('http://localhost:4200/post')
+  })
+})
+
+describe('check trending', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/explore')
   })
 })
