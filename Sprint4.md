@@ -12,7 +12,7 @@
     
     Assisted Frontend in making backend requests on Angular
 
-    Verified that the API is working correctly by creating multiple new Go unit tests for Files and Users
+    Verified that the API is working correctly by creating multiple new Go unit tests for Files, Users, Comments, Likes, and Followers
     
 # Backend Unit Tests:
 
@@ -889,15 +889,33 @@
  **username**: A string that identifies a user besides ID<br><br>
  **password**: A string to be used for login identification<br><br>
  **files**: A collection of File structs attributed to the user<br><br>
+ **profileinfo**: A struct representing the user's profile information <br><br>
+ **following**: An array of Users that the User is following
  
  ## File Struct
- 
  **Filename** : A string that identifies the file     <br><br>
  **Size**     : 64-bit int that stores the file size. <br><br>
  **Type**     : A string that stores the file type.   <br><br>
  **OwnerID**  : String that corresponds to the owner. <br><br>
  **CreatedAt**: Time the file was created. 	      <br><br>
  **Data**     : Byte array that stores the data       <br><br>
+ **Likes**    : An integer that represents the number of likes <br><br>
+ **LikedBy**  : A list of users that liked the file <br><br>
+ **Description** : A string with information on the file<br><br>
+ **Comments** : An array of Comment structs representing comments by users <br><br>
+ 
+ ## Comment Struct
+**gorm.Model**:  Stores uint ID for identification, time.Time CreatedAt, time.Time UpdatedAt, and time.Time DeletedAt (initially null)<br><br>
+**Content**: A string representing what the commenter said<br><br>
+**PostedBy**: A user representing the user who commented<br><br>
+**UserID**: An integer representing the ID of the owner of the file receiving the comment<br><br>
+**FileID**: And integer representing the ID of the file receiveing the comment
+
+## ProfileInfo Struct
+**OwnerID**: An integer that is copied from the User's ID field<br><br>
+**Name**: A string representing the name added to the profile by the user<br><br>
+**JobTitle**: A string representing the job title added to the profile by the user<br><br>
+**Description**: A string representing the profile description added to the profile by the user
  
  ## User Functions
     
@@ -924,6 +942,8 @@
  **getLikedByUsers()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{uid}/files/{id}/{fid}/unlike", unlikeFile).Methods("POST") handle in initializeRouter. <br><br>
  
  ## Profile Info Functions
+   **updateProfileInfo()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/profile", UpdateProfileInfo) handle in initializeRouter. <br><br>
+ **getProfileInfo()**: This function takes in a ResponseWriter and an HTTP request as input parameters. It is associated with the ("/api/users/{id}/profile", GetProfileInfo).Methods("GET") handle in initializeRouter. <br><br>
  
  ## File Functions
  
