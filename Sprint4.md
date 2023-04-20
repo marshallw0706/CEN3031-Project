@@ -1,5 +1,313 @@
 # Front-End
 
+In this sprint we focused on minor issues that we had in Sprint 3 and added functionality to the app. 
+
+We changed the layout and writing in all of the headers and added a slogan. 
+
+We updated the mat-icon in the side navigation to better fit what they led to. 
+
+We changed the explore page to a trending page that shows users the top 20 artists of the day. We added 20 different artists that have an actual user name and it has a picture of the album/single with a small caption. The user is also able to click the Go to Profile button and it will lead them to the profile of the user.
+
+We also created an about us button on the sidbar that leads the user to a pafe that gives a short desciption on what the app is and how they can be featured in the top 20 artists page. 
+
+We fixed up the way the profile page looks. We placed the profile of the user on a mat-card and centered it. Users can click on the pencil next to their name and edit the information including the picture.
+
+The home page was also fixed so that it shows on the same page of the side bar. Each post shows up on a mat-card and the user can click on the like button to like a photo, the comment button to comment, and can click on the username to go to the profile of the user.
+
+The post button was also fixed so that it shows up on the home page.
+
+The user can now click the logout button to logout
+
+User can use search bar to search for another user.
+
+Theme colors were changed to match the theme of the whole app. 
+
+Front-End Tests:
+
+it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+
+it('should create', () => {
+   expect(component).toBeTruthy();
+  });
+  
+it("testing header", ()=>{
+    const data=fixture.nativeElement;
+    expect(data.querySelector(".content").textContent).toContain("This explore page holds posts/music from other artists that they do not follow")
+  })
+
+
+it('should create the app', () => {
+    const fixture = TestBed.createComponent(SideBarComponent);
+    const app = fixture.componentInstance;
+    expect(app).toBeTruthy();
+  });
+
+  it(`should have as title 'homepage'`, () => {
+    const fixture = TestBed.createComponent(SideBarComponent);
+    const app = fixture.componentInstance;
+    expect(app.title).toEqual('homepage');
+  });
+
+  it('should render title', () => {
+    const fixture = TestBed.createComponent(SideBarComponent);
+    fixture.detectChanges();
+    const compiled = fixture.nativeElement as HTMLElement;
+    expect(compiled.querySelector('.content span')?.textContent).toContain('homepage app is running!');
+  });
+
+async gotoprofile()
+  {
+    const users$ = await this.httpClient.get<User[]>('/api/users', {})
+    const users = await lastValueFrom(users$)
+    for(var user of users)
+    {
+      if(user.username == this.usernametoprofile)
+      {
+        GlobalConstants.viewprofileid = user.ID
+        this.router.navigate(['profile'])
+      }
+    }
+  }
+
+    togglefollow()
+  {
+    this.user.following = !this.user.following
+    if(this.user.following)
+    {
+        this.httpClient.post('/api/users/'+GlobalConstants.loggedinid+'/follow/'+GlobalConstants.viewprofileid, {}).subscribe(
+          (response: any) => console.log("successful follow: " + response),
+      (error) => console.log("failure to follow: " + error)
+    );
+    }
+    if(!this.user.following)
+    {
+      this.httpClient.delete('/api/users/'+GlobalConstants.loggedinid+'/unfollow/'+GlobalConstants.viewprofileid, {}).subscribe(
+        (response: any) => console.log("successful unfollow: " + response),
+    (error) => console.log("failure to unfollow: " + error)
+  );
+    }
+  }
+
+    async getFiles()
+  {
+    const files$ = await this.httpClient.get<APIFile[]>('/api/users/'+GlobalConstants.viewprofileid+'/files', {})
+    this.files = await lastValueFrom(files$)
+    for(var file of this.files)
+    {
+      if((file.type == "image/png" || file.type == "image/jpg" || file.type == "image/jpeg")  && file.filename == "profilepic.png")
+      {
+        console.log("image recognized")
+        this.profile.userImage = "data:" + file.type + ";base64," + file.data
+        console.log(this.profile.userImage)
+      }
+    }
+    const profileinfo$ = await this.httpClient.get<ProfileInfo>('/api/users/'+GlobalConstants.viewprofileid+'/profile', {})
+    this.profileinfo = await lastValueFrom(profileinfo$)
+    console.log("this is " + this.profileinfo.name)
+    if(this.profileinfo.description != "")
+      this.profile.description = this.profileinfo.description
+    if(this.profileinfo.jobtitle != "")
+      this.profile.jobTitle = this.profileinfo.jobtitle
+    if(this.profileinfo.name != "")
+      this.profile.name = this.profileinfo.name
+    
+  }
+
+   async addLike(likefile: APIFile)
+
+    likefile.liked = !likefile.liked;
+
+  if (likefile.liked) {
+    likefile.likes++
+    this.httpClient.post('/api/users/' + GlobalConstants.loggedinid + '/like/' + likefile.owner_id + '/' + likefile.ID, {}).subscribe(
+      (response: any) => console.log("successful like: " + response),
+      (error) => console.log("failure to like: " + error)
+    );
+  } else {
+    likefile.likes--
+    this.httpClient.delete('/api/users/' + GlobalConstants.loggedinid + '/unlike/' + likefile.owner_id + '/' + likefile.ID, {}).subscribe(
+      (response: any) => console.log("successful unlike: " + response),
+      (error) => console.log("failure to unlike: " + error)
+    );
+  }
+
+  async checkUser()
+  {
+    const users$ = await this.httpClient.get<User[]>('/api/users', {})
+    this.users = await lastValueFrom(users$)
+    for(var user of this.users)
+    {
+      if(user.username == this.username && await compare(this.password, user.password))
+      {
+        this.success = true
+      }
+    }
+    this.username = ''
+    this.password = ''
+    if(this.success)
+    {
+      this.router.navigate(['sidebar'])
+    }
+  }
+
+  Cypress Test:
+  describe('check login page', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200')
+  })
+})
+
+describe('check sign up page', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/signup')
+  })
+})
+
+describe('check sidebar', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/sidebar')
+  })
+})
+
+describe('check profile', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/profile')
+  })
+})
+
+describe('check post', () => {
+  it('passes', () => {
+    cy.visit('http://localhost:4200/post')
+  })
+})
+
+andleHomeButtonClick() {
+    if (this.isPostVisible) {
+      this.togglePostVisibility();
+    }
+    this.homeComponent.getFiles();
+  }
+
+  async gotoprofile()
+  {
+    const users$ = await this.httpClient.get<User[]>('/api/users', {})
+    const users = await lastValueFrom(users$)
+    for(var user of users)
+    {
+      if(user.username == this.usernametoprofile)
+      {
+        GlobalConstants.viewprofileid = user.ID
+        this.router.navigate(['profile'])
+      }
+    }
+  }
+
+  togglePostVisibility() {
+    this.isPostVisible = !this.isPostVisible;
+  }
+
+describe('SearchingComponent', () => {
+  let component: SearchingComponent;
+  let fixture: ComponentFixture<SearchingComponent>;
+
+  beforeEach(async () => {
+    await TestBed.configureTestingModule({
+      declarations: [ SearchingComponent ]
+    })
+    .compileComponents();
+
+    fixture = TestBed.createComponent(SearchingComponent);
+    component = fixture.componentInstance;
+    fixture.detectChanges();
+  });
+
+  it('should create', () => {
+    expect(component).toBeTruthy();
+  });
+});
+
+  async getUsertoView()
+  {
+    const user$ = await this.httpClient.get<User>('/api/users/'+GlobalConstants.viewprofileid, {})
+    this.user = await lastValueFrom(user$)
+    this.handle = this.user.username
+    const users$ = this.httpClient.get<User[]>('/api/users/'+GlobalConstants.loggedinid+'/following', {})
+    this.users = await lastValueFrom(users$)
+    if(this.users != null)
+    {
+    for(var user of this.users)
+    {
+      console.log("Looking at users")
+      if(user.ID == GlobalConstants.viewprofileid)
+      {
+        this.user.following = true
+      }
+    }
+  }
+    if(this.user.following == null)
+    {
+      this.user.following = false
+    }
+  }
+
+  onFileSelected(event) {
+    this.uploadfile = event.target.files[0]
+}
+
+  uploadFile()
+  {
+    const formData = new FormData()
+    formData.append('file', this.uploadfile)
+    this.httpClient.post("/api/users/"+GlobalConstants.viewprofileid+"/files/upload", formData).subscribe(
+      (response: any) => {this.mostrecentfileid = response.ID; 
+      this.mostrecentfiletype = response.type;
+    if(this.mostrecentfiletype != "image/png" && this.mostrecentfiletype != "image/jpg" && this.mostrecentfiletype != "image/jpeg")
+    {
+      console.log(this.mostrecentfiletype + " not a valid type, deleting now")
+      this.httpClient.delete("/api/users/"+GlobalConstants.viewprofileid+"/files/"+this.mostrecentfileid, {}).subscribe()
+    }
+    else{
+    this.httpClient.put("/api/users/"+GlobalConstants.viewprofileid+"/files/"+this.mostrecentfileid, {"filename": "profilepic.png"}).subscribe()
+    }
+    this.getFiles()}, 
+      (error) => console.log("bad")
+    )
+
+  }
+
+  toggleEditMode() {
+    if(this.editMode)
+    {
+      this.httpClient.put("/api/users/"+GlobalConstants.viewprofileid+"/profile", {
+        "name": this.profile.name,
+        "jobtitle": this.profile.jobTitle,
+        "description": this.profile.description
+    }).subscribe((response: any) => console.log("good update profileinfo => " + response + " name: " + response.name), (error) => console.log("bad update profileinfo " + error))
+    }
+    this.editMode = !this.editMode;
+  }
+
+  togglefollow()
+  
+    this.user.following = !this.user.following
+    if(this.user.following)
+    {
+        this.httpClient.post('/api/users/'+GlobalConstants.loggedinid+'/follow/'+GlobalConstants.viewprofileid, {}).subscribe(
+          (response: any) => console.log("successful follow: " + response),
+      (error) => console.log("failure to follow: " + error)
+    );
+    }
+    if(!this.user.following)
+    
+      this.httpClient.delete('/api/users/'+GlobalConstants.loggedinid+'/unfollow/'+GlobalConstants.viewprofileid, {}).subscribe(
+        (response: any) => console.log("successful unfollow: " + response),
+    (error) => console.log("failure to unfollow: " + error)
+  );
+    
+  
+
 # Backend:
 
     Added ability to save profile info
